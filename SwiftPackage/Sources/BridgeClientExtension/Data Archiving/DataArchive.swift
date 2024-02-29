@@ -135,7 +135,7 @@ open class DataArchive : NSObject, Identifiable {
         let metadata = ArchiveMetadata(files: manifest)
         let metadataDictionary = try metadata.jsonEncodedDictionary()
         try addMetadata(metadataDictionary)
-        // TODO: syoung 08/03/2023 Remove work-around. Add info.json file b/c otherwise the upload is marked as failed. 
+        // By default, add the bridge V2 exporter support - this allows researchers to continue to use existing scripts.
         try addBridgeV2Info()
         isCompleted = true
     }
@@ -215,7 +215,7 @@ open class DataArchive : NSObject, Identifiable {
                                         dataFilename: dataFilename,
                                         format: format,
                                         item: schemaIdentifier ?? identifier,
-                                        schemaRevision: schemaRevision,
+                                        schemaRevision: schemaRevision ?? 1,
                                         appName: platformConfig.appName,
                                         appVersion: platformConfig.appVersionName,
                                         phoneInfo: platformConfig.deviceInfo)
@@ -236,7 +236,7 @@ public struct BridgeUploaderInfoV2 : Encodable {
     let dataFilename: String
     let format: FormatVersion
     let item: String
-    let schemaRevision: Int?
+    let schemaRevision: Int
     let appName: String
     let appVersion: String
     let phoneInfo: String
