@@ -32,7 +32,7 @@ open class DataArchive : NSObject, Identifiable {
     public let identifier: String
     
     /// The schedule associated with this archive (if any).
-    public let schedule: AssessmentScheduleInfo?
+    public let schedule: AdherenceRecordId?
     
     /// A timestamp for the data archive that can be mapped to an adherence record so
     /// that the record created by this library can be marked as "uploaded" in the
@@ -70,7 +70,7 @@ open class DataArchive : NSObject, Identifiable {
     private let archiver: BridgeArchiver
     
     public init?(identifier: String,
-                 schedule: AssessmentScheduleInfo? = nil,
+                 schedule: AdherenceRecordId? = nil,
                  startedOn: Date? = nil,
                  dataGroups: [String]? = nil) {
         guard let archiver = BridgeArchiver() else { return nil }
@@ -145,10 +145,11 @@ open class DataArchive : NSObject, Identifiable {
         var metadataDictionary: [String : Any] = metadata
         
         // Add metadata values from the schedule.
-        if let schedule = self.schedule {
-            metadataDictionary[kScheduledActivityGuidKey] = schedule.instanceGuid
+        metadataDictionary[kScheduledOnKey] = schedule?.scheduledOn
+        metadataDictionary[kScheduledActivityGuidKey] = schedule?.instanceGuid
+        
+        if let schedule = self.schedule as? AssessmentScheduleInfo {
             metadataDictionary[kScheduleIdentifierKey] = schedule.session.instanceGuid
-            metadataDictionary[kScheduledOnKey] = ISO8601TimestampFormatter.string(from: schedule.session.scheduledOn)
             metadataDictionary[kScheduledActivityLabelKey] = schedule.assessmentInfo.label
         }
         

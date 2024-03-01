@@ -66,11 +66,11 @@ class UploadManager : NSObject, BridgeURLSessionHandler, BackgroundProcessSyncDe
     ///   - startedOn: The `startedOn` value for the associated adherence record that is used to uniquely identify it.
     /// - Returns: `true` if the file was successfully copied and queued for upload.
     @MainActor
-    func uploadEncryptedArchive(fileUrl: URL, schedule: AssessmentScheduleInfo?, startedOn: Date?) async -> Bool {
+    func uploadEncryptedArchive(fileUrl: URL, schedule: AdherenceRecordId?, startedOn: Date?) async -> Bool {
         let metadata: UploadMetadata? = schedule.map {
             UploadMetadata(
                 instanceGuid: $0.instanceGuid,
-                eventTimestamp: $0.session.eventTimestamp,
+                eventTimestamp: $0.eventTimestamp,
                 startedOn: startedOn?.jsonObject() as? String
             )
         }

@@ -44,9 +44,15 @@ public struct ScheduledAssessmentConfig : Identifiable {
     }
 }
 
+public protocol AdherenceRecordId {
+    var instanceGuid: String { get }
+    var eventTimestamp: String { get }
+    var scheduledOn: String { get }
+}
+
 /// Thread-safe assessment schedule info. Kotlin objects can only be accessed from the main thread or it causes
 /// a crash so this must be initialized on the main thread.
-public struct AssessmentScheduleInfo : Identifiable, Hashable, Codable {
+public struct AssessmentScheduleInfo : AdherenceRecordId, Identifiable, Hashable, Codable {
     public var id: String { instanceGuid }
     
     /// The ``BridgeClient.ScheduledAssessment/instanceGuid`` for this scheduled assessment.
@@ -57,6 +63,14 @@ public struct AssessmentScheduleInfo : Identifiable, Hashable, Codable {
     
     /// Information about the assessment.
     public let assessmentInfo: Info
+    
+    public var eventTimestamp: String {
+        session.eventTimestamp
+    }
+    
+    public var scheduledOn: String {
+        ISO8601TimestampFormatter.string(from: session.scheduledOn)
+    }
     
     public var assessmentIdentifier : String {
         assessmentInfo.identifier
