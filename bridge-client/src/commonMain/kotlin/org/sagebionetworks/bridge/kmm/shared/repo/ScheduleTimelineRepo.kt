@@ -191,10 +191,10 @@ internal fun NotificationInfo.scheduleAt(instanceGuid: String,
     val timeZone = TimeZone.currentSystemDefault()
     val period = this.offset?.let { DateTimePeriod.parse(it) } ?: DateTimePeriod()
     val lastInstant = endDateTime.toInstant(timeZone)
-    var firstInstant = if (notifyAt == NotificationType.AFTER_WINDOW_START) {
-        startDateTime.toInstant(timeZone).plus(period, timeZone)
-    } else {
-        lastInstant.minus(period, timeZone)
+    var firstInstant = when (notifyAt) {
+        NotificationType.BEFORE_BURST_START -> startDateTime.toInstant(timeZone).minus(period, timeZone)
+        NotificationType.AFTER_WINDOW_START -> startDateTime.toInstant(timeZone).plus(period, timeZone)
+        NotificationType.BEFORE_WINDOW_END -> lastInstant.minus(period, timeZone)
     }
 
     // If there is an interval, move the firstInstant forward to after the current time
@@ -212,7 +212,7 @@ internal fun NotificationInfo.scheduleAt(instanceGuid: String,
         instanceGuid,
         firstInstant.toLocalDateTime(timeZone),
         intervalPeriod,
-        if (intervalPeriod ==null) null else lastInstant.toLocalDateTime(timeZone),
+        if (intervalPeriod == null) null else lastInstant.toLocalDateTime(timeZone),
         allowSnooze ?: false,
         message,
         isTimeSensitive
