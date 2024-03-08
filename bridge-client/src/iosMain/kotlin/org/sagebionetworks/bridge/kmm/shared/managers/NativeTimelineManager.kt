@@ -333,3 +333,33 @@ data class NativeAssessmentConfig(
     val config: NSData?,
     val restoredResult: NSData?
 )
+
+data class NativeUserAvailabilityWindow(
+    val wakeTime: NSDateComponents,
+    val bedTime: NSDateComponents,
+) {
+    fun toKotlin() : UserAvailabilityWindow =
+        UserAvailabilityWindow(
+            wakeTime = wakeTime.toLocalTime(),
+            bedTime = bedTime.toLocalTime(),
+        )
+}
+
+fun UserAvailabilityWindow.toNative() : NativeUserAvailabilityWindow =
+    NativeUserAvailabilityWindow(
+        wakeTime = this.wakeTime.toNSDateComponents(),
+        bedTime = this.bedTime.toNSDateComponents(),
+    )
+
+fun LocalTime.toNSDateComponents(): NSDateComponents {
+    val components = NSDateComponents()
+    components.hour = hour.toLong()
+    components.minute = minute.toLong()
+    return components
+}
+
+fun NSDateComponents.toLocalTime(): LocalTime =
+    LocalTime(
+        hour = this.hour.toInt() % 24,
+        minute = this.minute.toInt() % 60,
+    )

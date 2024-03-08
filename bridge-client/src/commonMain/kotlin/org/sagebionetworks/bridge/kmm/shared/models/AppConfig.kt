@@ -14,6 +14,7 @@ package org.sagebionetworks.bridge.kmm.shared.models
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonElement
+import org.sagebionetworks.bridge.kmm.shared.repo.decodeObjectWithKey
 
 /**
  * An app configuration object. 
@@ -70,4 +71,7 @@ data class AppConfig (
     @SerialName("type")
     val type: String? = null
 )
+
+val AppConfig.scheduleConfig: ScheduleConfig?
+    get() = clientData?.decodeObjectWithKey("scheduleConfig", AppScheduleConfig.serializer())
 

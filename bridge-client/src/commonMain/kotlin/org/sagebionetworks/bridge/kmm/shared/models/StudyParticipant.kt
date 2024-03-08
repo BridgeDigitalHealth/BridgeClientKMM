@@ -49,7 +49,7 @@ import kotlinx.serialization.Serializable
  * @param type StudyParticipant
  */
 @Serializable
-data class StudyParticipant (
+internal data class StudyParticipant (
     /* First name (given name) of the user. */
     @SerialName("firstName")
     @EncodeDefault(EncodeDefault.Mode.NEVER)
