@@ -81,17 +81,6 @@ class AdherenceRecordRepo(httpClient: HttpClient,
         }
     }
 
-
-    // TODO: Remove once this method is not longer being used by ScheduleTimelineRep -nbrown 10/17/22
-    /**
-     * Get the locally cached [AdherenceRecord]s for the specified [instanceIds].
-     */
-    @Deprecated("Uses old resource based cache, needs replaced with new implementation")
-    fun getCachedAdherenceRecords(instanceIds: List<String>, studyId: String) : Map<String, List<AdherenceRecord>> {
-        val list: List<AdherenceRecord> = database.getResourcesByIds(instanceIds, ResourceType.ADHERENCE_RECORD, studyId).mapNotNull { it.loadResource() }
-        return list.groupBy { it.instanceGuid }
-    }
-
     /**
      * Download and cache locally all [AdherenceRecord]s for the given study.
      * For now this only requests records using the current timestamps.
@@ -117,7 +106,6 @@ class AdherenceRecordRepo(httpClient: HttpClient,
     }
 
     suspend fun processAdherenceRecordUpdates(studyId: String) {
-        processUpdates(studyId)
         processUpdatesV2(studyId)
     }
 
@@ -130,31 +118,21 @@ class AdherenceRecordRepo(httpClient: HttpClient,
     }
 
     private fun insertUpdate(studyId: String, adherenceRecord: AdherenceRecord, needSave: Boolean) {
-        //TODO: Don't overwrite records that have needSave=true -nbrown 10/10/22
-        val json = Json.encodeToString(adherenceRecord)
-        //TODO: removing writing to resource table -nbrown 10/17/22
-        val resource = Resource(
-            identifier = adherenceRecord.instanceGuid,
-            secondaryId = adherenceRecord.startedOn.toString(),
-            type = ResourceType.ADHERENCE_RECORD,
-            studyId = studyId,
-            json = json,
-            lastUpdate = Clock.System.now().toEpochMilliseconds(),
-            status = ResourceStatus.SUCCESS,
-            needSave = false)
-        database.insertUpdateResource(resource)
-        //Insert into new adherence specific table
-        dbQuery.insertUpdateAdherenceRecord(
-            studyId = studyId,
-            instanceGuid = adherenceRecord.instanceGuid,
-            startedOn = adherenceRecord.startedOn.toString(),
-            finishedOn = adherenceRecord.finishedOn?.toString(),
-            declined = adherenceRecord.declined,
-            adherenceEventTimestamp = adherenceRecord.eventTimestamp,
-            adherenceJson = Json.encodeToString(adherenceRecord),
-            status = ResourceStatus.SUCCESS,
-            needSave = needSave
-        )
+        // Check that update is a local change or will not overwrite local change
+        if (needSave || dbQuery.getAdherence(adherenceRecord.instanceGuid, adherenceRecord.startedOn.toString()).executeAsOneOrNull()?.needSave != true) {
+            //Insert into new adherence specific table
+            dbQuery.insertUpdateAdherenceRecord(
+                studyId = studyId,
+                instanceGuid = adherenceRecord.instanceGuid,
+                startedOn = adherenceRecord.startedOn.toString(),
+                finishedOn = adherenceRecord.finishedOn?.toString(),
+                declined = adherenceRecord.declined,
+                adherenceEventTimestamp = adherenceRecord.eventTimestamp,
+                adherenceJson = Json.encodeToString(adherenceRecord),
+                status = ResourceStatus.SUCCESS,
+                needSave = needSave
+            )
+        }
 
     }
 
@@ -167,65 +145,8 @@ class AdherenceRecordRepo(httpClient: HttpClient,
         Logger.i("Updating adherence record:${adherenceRecord.instanceGuid}, finished:${adherenceRecord.finishedOn}")
         insertUpdate(studyId, record, needSave = true)
         backgroundScope.launch {
-            processUpdates(studyId)
             processUpdatesV2(studyId)
         }
-    }
-
-    /**
-     * Save any locally cached [AdherenceRecord]s that haven't been uploaded to Bridge server.
-     * Any failures will remain in a needSave state and be tried again the next time.
-     */
-    //TODO: Remove in future release -nbrown 10/17/22
-    private suspend fun processUpdates(studyId: String) {
-        val resourcesToUpload = database.getResourcesNeedSave(ResourceType.ADHERENCE_RECORD, studyId)
-        if (resourcesToUpload.isEmpty()) return
-        val chunkedList = resourcesToUpload.chunked(25)
-        for (resources in chunkedList) {
-            processUpdates(studyId, resources)
-        }
-    }
-
-    private suspend fun processUpdates(studyId: String, resourcesToUpload: List<Resource>) {
-        val records: List<AdherenceRecord> = resourcesToUpload.mapNotNull { it.loadResource() }
-        if (records.isEmpty()) return
-        var status = ResourceStatus.FAILED
-        var needSave = true
-        try {
-            scheduleV2Api.updateAdherenceRecords(studyId, records)
-            status = ResourceStatus.SUCCESS
-            needSave = false
-        } catch (throwable: Throwable) {
-            println(throwable)
-            when (throwable) {
-                is ResponseException -> {
-                    when (throwable.response.status) {
-                        HttpStatusCode.Unauthorized -> {
-                            // 401 unauthorized
-                            // User hasn't authenticated or re-auth has failed.
-                        }
-                        HttpStatusCode.Gone -> {
-                            //410 Gone
-                            // The version of the client making the request no longer has access to this service.
-                            // The user must update their app in order to continue using Bridge.
-                        }
-                        HttpStatusCode.PreconditionFailed -> {
-                            //412 Not consented
-                        }
-                    }
-                }
-
-                is UnresolvedAddressException -> {
-                    //Internet connection error
-                    status = ResourceStatus.RETRY
-                }
-            }
-        }
-        for (resource in resourcesToUpload) {
-            val toUpdate = resource.copy(status = status, needSave = needSave)
-            database.insertUpdateResource(toUpdate)
-        }
-
     }
 
     /**
