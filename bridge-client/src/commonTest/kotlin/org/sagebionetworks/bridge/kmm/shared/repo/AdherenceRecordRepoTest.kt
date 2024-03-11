@@ -1,14 +1,26 @@
 package org.sagebionetworks.bridge.kmm.shared.repo
 
+import io.ktor.client.engine.config
+import io.ktor.client.engine.mock.MockEngine
+import io.ktor.client.engine.mock.respondError
+import io.ktor.client.engine.mock.respondOk
+import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.datetime.TimeZone
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.jsonPrimitive
 import org.sagebionetworks.bridge.kmm.shared.BaseTest
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceDatabaseHelper
+import org.sagebionetworks.bridge.kmm.shared.cache.ResourceStatus
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceType
+import org.sagebionetworks.bridge.kmm.shared.getJsonReponseHandler
 import org.sagebionetworks.bridge.kmm.shared.getTestClient
 import org.sagebionetworks.bridge.kmm.shared.models.UploadFile
 import org.sagebionetworks.bridge.kmm.shared.models.UploadMetadata
@@ -44,23 +56,61 @@ class AdherenceRecordRepoTest: BaseTest() {
         runTest {
             val studyId = "testId"
             val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
-            val repo = AdherenceRecordRepo(getTestClient(json), null, ResourceDatabaseHelper(testDatabaseDriver()), scope)
+            val mockEngine = MockEngine.config {
+                // 1 - Load adherence call
+                addHandler (
+                    getJsonReponseHandler(json)
+                )
+                // 2 - Process updates call needs to fail so we still have pending local changes
+                addHandler { respondError(HttpStatusCode.GatewayTimeout) }
+                // 3 - Second Load adherence call
+                addHandler (
+                    getJsonReponseHandler(json)
+                )
+                reuseHandlers = false
+            }
+            val testClient = getTestClient(mockEngine)
+
+            val repo = AdherenceRecordRepo(testClient, null, ResourceDatabaseHelper(testDatabaseDriver()), scope)
 
             assertTrue(repo.loadRemoteAdherenceRecords(studyId))
-            val adherenceRecord = repo.getCachedAdherenceRecord(instanceGuid, startedOn)
+            var adherenceRecord = repo.getCachedAdherenceRecord(instanceGuid, startedOn)
             assertNotNull(adherenceRecord)
 
-            val recordMap =  repo.getCachedAdherenceRecords(listOf(instanceGuid), studyId)
+            val recordMap =  repo.getAllCachedAdherenceRecords(studyId).first()
             assertEquals(1, recordMap.size)
-            val recordList = recordMap.get(instanceGuid)
+            val recordList = recordMap[instanceGuid]
             assertNotNull(recordList)
-            val record = recordList.get(0)
+            val record = recordList[0]
             assertNotNull(record)
             assertEquals(instanceGuid, record.instanceGuid)
+
+            val updatedRecord = record.copy(clientData = JsonPrimitive("Test data"))
+            repo.database.database.participantScheduleQueries.insertUpdateAdherenceRecord(
+                studyId = studyId,
+                instanceGuid = updatedRecord.instanceGuid,
+                startedOn = updatedRecord.startedOn.toString(),
+                finishedOn = updatedRecord.finishedOn?.toString(),
+                declined = updatedRecord.declined,
+                adherenceEventTimestamp = updatedRecord.eventTimestamp,
+                adherenceJson = Json.encodeToString(updatedRecord),
+                status = ResourceStatus.SUCCESS,
+                needSave = true
+            )
+            var dbRecord = repo.database.database.participantScheduleQueries.getAdherence(instanceGuid, startedOn).executeAsOne()
+            assertTrue(dbRecord.needSave)
+            adherenceRecord = repo.getCachedAdherenceRecord(instanceGuid, startedOn)
+            assertEquals("\"Test data\"", adherenceRecord!!.clientData.toString())
+
+            // Trigger a load of data
+            assertTrue(repo.loadRemoteAdherenceRecords(studyId))
+            // Check that local changes did not get overwritten
+            dbRecord = repo.database.database.participantScheduleQueries.getAdherence(instanceGuid, startedOn).executeAsOne()
+            assertTrue(dbRecord.needSave)
+            adherenceRecord = repo.getCachedAdherenceRecord(instanceGuid, startedOn)
+            assertEquals("\"Test data\"", adherenceRecord!!.clientData.toString())
+
             val db = repo.database
-            val resource = db.getResource(instanceGuid, ResourceType.ADHERENCE_RECORD, studyId)
-            assertNotNull(resource)
-            assertFalse(resource.needSave)
             db.clearDatabase()
         }
     }
