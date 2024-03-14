@@ -17,6 +17,11 @@ interface ScheduleConfig {
     val availabilityConfig: UserAvailabilityConfig?
 
     /**
+     * The default availability window to use if the participant's availability is not set.
+     */
+    val defaultAvailabilityWindow : UserAvailabilityWindow?
+
+    /**
      * The session schedule type for a given session.
      */
     fun sessionScheduleType(refGuid: String) : SessionScheduleType
@@ -40,6 +45,7 @@ interface ScheduleConfig {
 data class AppScheduleConfig(
     override val availabilityConfig: UserAvailabilityConfig? = null,
     override val alwaysRandomizedAssessments: Boolean = false,
+    override val defaultAvailabilityWindow: UserAvailabilityWindow? = null,
 
     /**
      * A list of assessment identifiers that should always have their order randomized.
@@ -66,6 +72,7 @@ data class AppScheduleConfig(
 @Serializable
 data class StudyScheduleConfig(
     override val availabilityConfig: UserAvailabilityConfig? = null,
+    override val defaultAvailabilityWindow: UserAvailabilityWindow? = null,
 
     /**
      * A map of the session guid to the schedule type.

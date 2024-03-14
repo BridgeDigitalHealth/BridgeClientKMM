@@ -1,21 +1,19 @@
 package org.sagebionetworks.bridge.kmm.shared.models
 
-import co.touchlab.kermit.Logger
 import kotlinx.datetime.DateTimePeriod
 import kotlinx.datetime.LocalTime
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlin.random.Random
 import kotlin.math.max
 
 @Serializable
 data class UserAvailabilityWindow(
     /** LocalTime HH:mm format of the time the user wakes up and is available **/
     @SerialName("wake")
-    var wakeTime: LocalTime,
+    var wakeTime: LocalTime = LocalTime.MIDNIGHT,
     /** LocalTime HH:mm format of the time the user goes to bed and is not available **/
     @SerialName("bed")
-    var bedTime: LocalTime,
+    var bedTime: LocalTime = LocalTime.MIDNIGHT,
 ) {
 
     companion object {
@@ -25,9 +23,16 @@ data class UserAvailabilityWindow(
          * @param windowDuration The duration of the session window
          * @return Whether or not this schedule can be randomized.
          */
-        fun canRandomize(sessionsPerDay: Int, windowDuration: DateTimePeriod) : Boolean {
+        fun canRepeatDaily(sessionsPerDay: Int, windowDuration: DateTimePeriod) : Boolean {
             return windowDuration.totalMinutes * sessionsPerDay <= 24 * 60
         }
+    }
+
+    /**
+     * Does this availability window have `zero` duration?
+     */
+    fun isEmpty() : Boolean {
+        return wakeTime == bedTime
     }
 
     /**
@@ -45,36 +50,31 @@ data class UserAvailabilityWindow(
      * somewhat spontaneous/irregular.
      */
     fun randomSessionTimes(sessionsPerDay: Int, windowDuration: DateTimePeriod): List<LocalTime>? {
+        return if (canRepeatDaily(sessionsPerDay, windowDuration)) {
+            evenSpacedSessionTimes(sessionsPerDay, windowDuration).randomize()
+        } else null
+    }
 
-        // Exit early if attempting to randomize the times for a window duration that is
-        // more than 24 hours total.
-        // Note: Because uncaught exceptions will crash the app, and there's no way in Kotlin to
-        // specific that this function **could** throw an error, just log the failure and use
-        // null to indicate that randomization failed. syoung 03/12/2024
-        if (!canRandomize(sessionsPerDay, windowDuration)) {
-            Logger.e("Attempting to randomize session start times where the total duration of the windows is more than 24 hours.")
-            return null
-        }
+    /**
+     * Calculate evenly spaced session times throughout the repeat window.
+     */
+    internal fun evenSpacedSessionTimes(repeatTimeWindow: RepeatTimeWindow) : CalculatedScheduleWindows
+        = evenSpacedSessionTimes(repeatTimeWindow.count, repeatTimeWindow.expiration)
 
+    private fun evenSpacedSessionTimes(sessionsPerDay: Int, windowDuration: DateTimePeriod) : CalculatedScheduleWindows {
         val totalAvailabilityInMinutes = availabilityInMinutes()
         val desiredSessionWindow = totalAvailabilityInMinutes / sessionsPerDay
         val minimumSessionWindow = windowDuration.totalMinutes
         // if the availability is less that the required availability then use the minimumSessionWindow
         val actualSessionWindow = max(desiredSessionWindow, minimumSessionWindow)
         val spacing = actualSessionWindow - minimumSessionWindow
-        val randomTimes = mutableListOf<LocalTime>()
+        val times = mutableListOf<LocalTime>()
         for(ii in 0 until sessionsPerDay) {
-            // fixes issues where random.nextInt(0) throws exception
-            val randomOffset = if (spacing <= 0) 0 else Random.nextInt(spacing)
             // Each session window is banded to be within an equal spread of times.
-            val minutesFromWake = (actualSessionWindow * ii) + randomOffset
-            randomTimes.add(wakeTime.plusMinutes(minutesFromWake))
+            val minutesFromWake = (actualSessionWindow * ii)
+            times.add(wakeTime.plusMinutes(minutesFromWake))
         }
-
-        // Sorting the random times will allow for the days sessions to always
-        // be ascending in time.  This will fix any overnight availability.
-        // As outlined in https://sagebionetworks.jira.com/browse/DIAN-425
-        return randomTimes.sorted()
+        return CalculatedScheduleWindows(spacing, times)
     }
 }
 
@@ -86,25 +86,28 @@ data class UserAvailabilityWindow(
  */
 internal fun LocalTime.minutesUntil(endTime: LocalTime): Int {
     return if (this > endTime) {
-        this.minutesUntilEndOfDay() + endTime.toMinuteInDay()
+        this.minutesUntilEndOfDay() + endTime.toMinuteOfDay()
     } else {
-        endTime.toMinuteInDay() - this.toMinuteInDay()
+        endTime.toMinuteOfDay() - this.toMinuteOfDay()
     }
 }
+
+val LocalTime.Companion.MIDNIGHT : LocalTime
+    get() = LocalTime(0, 0)
 
 internal val DateTimePeriod.totalMinutes
     get() = hours * 60 + minutes
 
-internal fun LocalTime.toMinuteInDay() : Int {
+internal fun LocalTime.toMinuteOfDay() : Int {
     return this.hour * 60 + this.minute
 }
 
 internal fun LocalTime.minutesUntilEndOfDay() : Int {
-    return 24 * 60 - this.toMinuteInDay()
+    return 24 * 60 - this.toMinuteOfDay()
 }
 
 internal fun LocalTime.plusMinutes(minutes: Int) : LocalTime {
-    val newTimeInMinutes = this.toMinuteInDay() + minutes
+    val newTimeInMinutes = this.toMinuteOfDay() + minutes
     val hour = newTimeInMinutes / 60
     val minute = newTimeInMinutes - hour * 60
     // The "hour" will be greater than 24 if the minutes added crosses midnight.

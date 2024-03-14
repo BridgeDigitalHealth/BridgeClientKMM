@@ -307,6 +307,7 @@ data class AssessmentHistoryRecord (
 //    val minutes = finishedOn.minus(startedOn).inMinutes.roundToInt()
 }
 
+@Deprecated("Use internal mutator")
 interface ParticipantScheduleMutator {
 
     fun mutateParticipantSchedule(participantSchedule: ParticipantSchedule) : ParticipantSchedule

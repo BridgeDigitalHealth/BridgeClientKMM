@@ -51,7 +51,10 @@ data class SessionInfo (
 
     @SerialName("notifications")
     val notifications: List<NotificationInfo>? = null,
-    /* SessionInfo */
+
+    /** Used to store the original time window calculated from the participant schedule. **/
+    @SerialName("repeatTimeWindow")
+    var repeatTimeWindow: RepeatTimeWindow? = null,
 
     @SerialName("type")
     val type: String? = null

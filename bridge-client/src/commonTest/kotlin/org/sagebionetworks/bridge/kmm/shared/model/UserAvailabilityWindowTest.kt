@@ -3,6 +3,7 @@ package org.sagebionetworks.bridge.kmm.shared.model
 import kotlinx.datetime.DateTimePeriod
 import kotlinx.datetime.LocalTime
 import org.sagebionetworks.bridge.kmm.shared.BaseTest
+import org.sagebionetworks.bridge.kmm.shared.models.RepeatTimeWindow
 import org.sagebionetworks.bridge.kmm.shared.models.UserAvailabilityWindow
 import kotlin.test.Test
 import kotlin.test.assertContains
@@ -104,5 +105,30 @@ class UserAvailabilityWindowTest : BaseTest() {
         assertNotNull(secondRun)
         assertEquals(6, secondRun.size)
         assertNotEquals(startTimes, secondRun)
+    }
+
+    @Test
+    fun testEvenSpacedSessionTimes() {
+        val availabilityWindow = UserAvailabilityWindow(
+            wakeTime = LocalTime(9, 0),
+            bedTime = LocalTime(18, 0)
+        )
+
+        val repeatTimeWindow = RepeatTimeWindow(
+            availabilityWindow = availabilityWindow,
+            expiration = DateTimePeriod(hours = 1, minutes = 15),
+            count = 6
+        )
+
+        val calculated = availabilityWindow.evenSpacedSessionTimes(repeatTimeWindow)
+        val startTimes = calculated.startTimes
+        assertEquals(15, calculated.spacing)
+        assertEquals(6, startTimes.size)
+        assertEquals(LocalTime(9,0), startTimes[0])
+        assertEquals(LocalTime(10,30), startTimes[1])
+        assertEquals(LocalTime(12,0), startTimes[2])
+        assertEquals(LocalTime(13,30), startTimes[3])
+        assertEquals(LocalTime(15,0), startTimes[4])
+        assertEquals(LocalTime(16,30), startTimes[5])
     }
 }
