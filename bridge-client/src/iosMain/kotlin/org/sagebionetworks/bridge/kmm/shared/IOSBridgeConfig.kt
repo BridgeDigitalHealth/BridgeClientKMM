@@ -1,7 +1,6 @@
 package org.sagebionetworks.bridge.kmm.shared
 
-import kotlin.native.concurrent.AtomicReference
-import kotlin.native.concurrent.freeze
+import kotlin.concurrent.AtomicReference
 
 interface IOSPlatformConfig : PlatformConfig {
     val appGroupIdentifier: String?
@@ -12,6 +11,7 @@ object IOSBridgeConfig  : BridgeConfig {
 
     private val atomicRef: AtomicReference<IOSPlatformConfig?> = AtomicReference(null)
 
+    @Suppress("unused")
     fun initialize(platformConfig : IOSPlatformConfig) {
         atomicRef.compareAndSet(null, platformConfig)
     }

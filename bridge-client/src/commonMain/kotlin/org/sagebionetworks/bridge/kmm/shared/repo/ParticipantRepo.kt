@@ -31,7 +31,7 @@ class ParticipantRepo(httpClient: HttpClient,
         ensureNeverFrozen()
     }
 
-    internal var participantApi = ParticipantApi(
+    private var participantApi = ParticipantApi(
         httpClient = httpClient
     )
 

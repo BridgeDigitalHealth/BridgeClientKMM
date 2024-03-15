@@ -27,7 +27,6 @@ internal class StudyApi(basePath: String = BASE_PATH, httpClient: HttpClient) : 
      * @param studyId Study identifier
      * @return Study
      */
-    @Suppress("UNCHECKED_CAST")
     suspend fun getStudy(studyId: String) : Study {
         return getData("v5/studies/$studyId")
 

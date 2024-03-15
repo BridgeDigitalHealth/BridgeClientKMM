@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 package org.sagebionetworks.bridge.kmm.shared.managers
 
 import co.touchlab.kermit.Logger

@@ -70,8 +70,8 @@ data class AppConfig (
     /* AppConfig */
     @SerialName("type")
     val type: String? = null
-)
-
-val AppConfig.scheduleConfig: ScheduleConfig?
-    get() = clientData?.decodeObjectWithKey("scheduleConfig", AppScheduleConfig.serializer())
+) {
+    val scheduleConfig: ScheduleConfig?
+        get() = clientData?.decodeObjectWithKey("scheduleConfig", AppScheduleConfig.serializer())
+}
 

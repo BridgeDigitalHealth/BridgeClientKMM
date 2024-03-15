@@ -39,7 +39,5 @@ data class PhoneSignin (
     @SerialName("type")
     val type: kotlin.String? = null
 
-) {
-
-}
+)
 

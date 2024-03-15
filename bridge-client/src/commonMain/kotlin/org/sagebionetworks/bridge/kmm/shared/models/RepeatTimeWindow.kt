@@ -10,16 +10,16 @@ data class RepeatTimeWindow(
     /** The amount of time before a time window expires.  **/
     val expiration: DateTimePeriod = DateTimePeriod(),
     /** The number of time windows in a day. **/
-    val count: Int = 0,
+    val size: Int = 0,
 ) {
     /**
      * Is this repeat time window valid for setting up a daily repeating schedule?
      */
     fun isValid() : Boolean {
-        return count > 0 &&
+        return size > 0 &&
                 expiration.totalMinutes > 0 &&
                 !availabilityWindow.isEmpty() &&
-                UserAvailabilityWindow.canRepeatDaily(count, expiration)
+                UserAvailabilityWindow.canRepeatDaily(size, expiration)
     }
 
     fun ifValid() : RepeatTimeWindow? {

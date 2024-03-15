@@ -1,20 +1,12 @@
 package org.sagebionetworks.bridge.kmm.shared.repo
 
-import kotlinx.datetime.Clock
 import kotlinx.datetime.DateTimePeriod
 import kotlinx.datetime.DateTimeUnit
-import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.LocalTime
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.atStartOfDayIn
-import kotlinx.datetime.minus
 import kotlinx.datetime.plus
-import kotlinx.datetime.toInstant
-import kotlinx.serialization.SerialName
 import org.sagebionetworks.bridge.kmm.shared.BaseTest
-import org.sagebionetworks.bridge.kmm.shared.models.AppScheduleConfig
 import org.sagebionetworks.bridge.kmm.shared.models.CalculatedScheduleWindows
 import org.sagebionetworks.bridge.kmm.shared.models.PerformanceOrder
 import org.sagebionetworks.bridge.kmm.shared.models.RepeatTimeWindow
@@ -34,8 +26,6 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertNotEquals
 import kotlin.test.assertNotNull
-import kotlin.time.Duration
-import kotlin.time.toDuration
 
 @OptIn(ExperimentalStdlibApi::class)
 class RandomizedScheduleMutatorTest : BaseTest() {
@@ -63,7 +53,7 @@ class RandomizedScheduleMutatorTest : BaseTest() {
             label = "Random",
             performanceOrder = PerformanceOrder.PARTICIPANT_CHOICE,
             repeatTimeWindow = RepeatTimeWindow(
-                count = 4,
+                size = 4,
                 expiration = DateTimePeriod(minutes = 90),
                 availabilityWindow = availabilityWindow
             )
@@ -161,7 +151,7 @@ class RandomizedScheduleMutatorTest : BaseTest() {
             performanceOrder = PerformanceOrder.PARTICIPANT_CHOICE,
         )
         val expectedRepeatTimeWindow = RepeatTimeWindow(
-            count = 4,
+            size = 4,
             expiration = DateTimePeriod(minutes = 90),
             availabilityWindow = UserAvailabilityWindow(
                 LocalTime(9, 0),
@@ -228,7 +218,7 @@ class RandomizedScheduleMutatorTest : BaseTest() {
             val expectedDate = startDate.plus(index, DateTimeUnit.DAY)
             assertEquals(expectedDate, day.startDate)
             assertEquals(scheduledSessions.filter { it.startDate == expectedDate }, day.scheduledSessions)
-            assertEquals(4, day.repeatTimeWindow.count)
+            assertEquals(4, day.repeatTimeWindow.size)
             assertEquals(90, day.repeatTimeWindow.expiration.totalMinutes)
             assertEquals(expectedAvailabilityWindow, day.repeatTimeWindow.availabilityWindow)
         }

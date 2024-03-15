@@ -30,8 +30,8 @@ import kotlinx.serialization.Serializable
  */
 @Serializable
 data class Timeline (
-    /* The length of time of the study’s protocol, after which the participant has completed the study. Events in the timeline will not extend past this duration in time. */
 
+    /* The length of time of the study’s protocol, after which the participant has completed the study. Events in the timeline will not extend past this duration in time. */
     @SerialName("duration")
     val duration: DateTimePeriod,
 
@@ -46,16 +46,20 @@ data class Timeline (
 
     @SerialName("studyBursts")
     val studyBursts: List<StudyBurstInfo>? = null,
-    /* The total number of minutes to perform all the sessions in the timeline. This information is provided for informational purposes to schedule designers. */
 
+    /* The total number of minutes to perform all the sessions in the timeline. This information
+    is provided for informational purposes to schedule designers. */
     @SerialName("totalMinutes")
     val totalMinutes: Int? = null,
-    /* The total number of notifications that could be shown to the participant (if all possible notifications are shown; fewer notifications may be shown since the participant may complete sessions before all reminders are shown for the session). This information is provided for informational purposes to schedule designers. */
 
+    /* The total number of notifications that could be shown to the participant (if all possible
+    notifications are shown; fewer notifications may be shown since the participant may complete
+    sessions before all reminders are shown for the session). This information is provided for
+    informational purposes to schedule designers. */
     @SerialName("totalNotifications")
     val totalNotifications: Int? = null,
-    /* Timeline */
 
+    /* Timeline */
     @SerialName("type")
     val type: String? = null
 )

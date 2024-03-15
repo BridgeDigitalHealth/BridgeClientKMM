@@ -13,6 +13,7 @@ package org.sagebionetworks.bridge.kmm.shared.models
 
 
 import kotlinx.serialization.EncodeDefault
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -36,7 +37,7 @@ import kotlinx.serialization.Serializable
  * @param clientData Client data for a user should be in a syntactically valid JSON format. It will be returned as is to the client (as JSON). 
  * @param languages Two letter language codes to assign to this user (these are initially retrieved from the user's `Accept-Language` header and then persisted as part of account configuration).  
  * @param studyIds The studies this participant is associated to. For administrative accounts, these are the studies associated to the account's organization. For study participants, these will be the studies that the person is enrolled in.
- * @param externalIds The exernal IDs this participant is associated to, mapped to the study that issued the external ID. Typically a user signs up with the external ID, and is assigned to that study as a result.
+ * @param externalIds The external IDs this participant is associated to, mapped to the study that issued the external ID. Typically a user signs up with the external ID, and is assigned to that study as a result.
  * @param orgMembership The identifier of the organization this account is a member of (this will be an administrative account and not a study participant). Once set, it cannot be changed on an update (there are separate organization membership APIs to change organizational membership).
  * @param clientTimeZone Participant's time zone. Can be updated or deleted. Must be an IANA time zone name.
  * @param healthCode Only included in studies that have been configured to return the health code, and only to researchers through the researcher APIs.
@@ -48,38 +49,39 @@ import kotlinx.serialization.Serializable
  * @param timeZone User's original time zone, as measured by the timezone used to request activities, as a string offset in ISO8601 format. Related to the v3 scheduling API, it is not always set or reliable.
  * @param type StudyParticipant
  */
+@OptIn(ExperimentalSerializationApi::class)
 @Serializable
 internal data class StudyParticipant (
     /* First name (given name) of the user. */
     @SerialName("firstName")
     @EncodeDefault(EncodeDefault.Mode.NEVER)
-    val firstName: kotlin.String? = null,
+    val firstName: String? = null,
 
     /* Last name (family name) of the user. */
     @SerialName("lastName")
     @EncodeDefault(EncodeDefault.Mode.NEVER)
-    val lastName: kotlin.String? = null,
+    val lastName: String? = null,
 
     /* The numerical identifier for a Synapse account. For administrative accounts, this will allow the user to sign in using Synapse accounts, no further credentials are needed to access the system. This value can only be set when creating an account; otherwise the identifiers update API must be used to add the ID to an existing account.  */
     @SerialName("synapseUserId")
     @EncodeDefault(EncodeDefault.Mode.NEVER)
-    val synapseUserId: kotlin.String? = null,
+    val synapseUserId: String? = null,
 
     //Readonly
     /* An ID assigned to this account by Bridge system. This ID is exposed in the API and is different from the health code assigned to the user's anonymized data. Bridge never exports this ID along with the health code from Bridge.    */
     @SerialName("id")
     @EncodeDefault(EncodeDefault.Mode.NEVER)
-    val id: kotlin.String? = null,
+    val id: String? = null,
 
     /* True if the user has consented to be contacted via email outside the application, false otherwise.  */
     @SerialName("notifyByEmail")
     @EncodeDefault(EncodeDefault.Mode.NEVER)
-    val notifyByEmail: kotlin.Boolean = true,
+    val notifyByEmail: Boolean = true,
 
     /* A map of user profile attributes that have been set for this user (the attributes themselves must be specified in the app's configuration, and the values are stored encrypted in case they capture personally-identifying information).  */
     @SerialName("attributes")
     @EncodeDefault(EncodeDefault.Mode.NEVER)
-    val attributes: kotlin.collections.Map<kotlin.String, kotlin.String>? = null,
+    val attributes: Map<String, String>? = null,
     
     @SerialName("sharingScope")
     @EncodeDefault(EncodeDefault.Mode.NEVER)
@@ -89,17 +91,17 @@ internal data class StudyParticipant (
     /* The date and time the account was created. */
     @SerialName("createdOn")
     @EncodeDefault(EncodeDefault.Mode.NEVER)
-    val createdOn: kotlin.String? = null,
+    val createdOn: String? = null,
 
     /* Has the user verified that they have control of this email address? */
     @SerialName("emailVerified")
     @EncodeDefault(EncodeDefault.Mode.NEVER)
-    val emailVerified: kotlin.Boolean? = null,
+    val emailVerified: Boolean? = null,
 
     /* Has the user verified that they have control of this phone number? */
     @SerialName("phoneVerified")
     @EncodeDefault(EncodeDefault.Mode.NEVER)
-    val phoneVerified: kotlin.Boolean? = null,
+    val phoneVerified: Boolean? = null,
     
     @SerialName("status")
     @EncodeDefault(EncodeDefault.Mode.NEVER)
@@ -107,12 +109,12 @@ internal data class StudyParticipant (
     
     @SerialName("roles")
     @EncodeDefault(EncodeDefault.Mode.NEVER)
-    val roles: kotlin.collections.List<Role>? = null,
+    val roles: List<Role>? = null,
 
     /* The data groups set for this user. Data groups must be strings that are defined in the list of all valid data groups for the app, as part of the app object.   */
     @SerialName("dataGroups")
     @EncodeDefault(EncodeDefault.Mode.NEVER)
-    val dataGroups: kotlin.collections.List<kotlin.String>? = null,
+    val dataGroups: List<String>? = null,
 
     /* Client data for a user should be in a syntactically valid JSON format. It will be returned as is to the client (as JSON).  */
     @SerialName("clientData")
@@ -121,38 +123,38 @@ internal data class StudyParticipant (
     /* Two letter language codes to assign to this user (these are initially retrieved from the user's `Accept-Language` header and then persisted as part of account configuration).   */
     @SerialName("languages")
     @EncodeDefault(EncodeDefault.Mode.NEVER)
-    val languages: kotlin.collections.List<kotlin.String>? = null,
+    val languages: List<String>? = null,
 
     //Readonly
     /* The studies this participant is associated to. For administrative accounts, these are the studies associated to the account's organization. For study participants, these will be the studies that the person is enrolled in. */
     @SerialName("studyIds")
     @EncodeDefault(EncodeDefault.Mode.NEVER)
-    val studyIds: kotlin.collections.List<kotlin.String>? = null,
+    val studyIds: List<String>? = null,
 
-    /* The exernal IDs this participant is associated to, mapped to the study that issued the external ID. Typically a user signs up with the external ID, and is assigned to that study as a result. */
+    /* The external IDs this participant is associated to, mapped to the study that issued the external ID. Typically a user signs up with the external ID, and is assigned to that study as a result. */
     @SerialName("externalIds")
     @EncodeDefault(EncodeDefault.Mode.NEVER)
-    val externalIds: kotlin.collections.Map<kotlin.String, kotlin.String>? = null,
+    val externalIds: Map<String, String>? = null,
 
     /* The identifier of the organization this account is a member of (this will be an administrative account and not a study participant). Once set, it cannot be changed on an update (there are separate organization membership APIs to change organizational membership). */
     @SerialName("orgMembership")
     @EncodeDefault(EncodeDefault.Mode.NEVER)
-    val orgMembership: kotlin.String? = null,
+    val orgMembership: String? = null,
 
     /* Participant's time zone. Can be updated or deleted. Must be an IANA time zone name.  */
     @SerialName("clientTimeZone")
     @EncodeDefault(EncodeDefault.Mode.NEVER)
-    val clientTimeZone: kotlin.String? = null,
+    val clientTimeZone: String? = null,
 
     /* Only included in studies that have been configured to return the health code, and only to researchers through the researcher APIs.  */
     @SerialName("healthCode")
     @EncodeDefault(EncodeDefault.Mode.NEVER)
-    val healthCode: kotlin.String? = null,
+    val healthCode: String? = null,
 
     /* The user's email. */
     @SerialName("email")
     @EncodeDefault(EncodeDefault.Mode.NEVER)
-    val email: kotlin.String? = null,
+    val email: String? = null,
 
     @SerialName("phone")
     @EncodeDefault(EncodeDefault.Mode.NEVER)
@@ -161,28 +163,26 @@ internal data class StudyParticipant (
     /* A complete historical record of all the user's consents and withdrawals of consent for all studies in the app.  */
     @SerialName("consentHistories")
     @EncodeDefault(EncodeDefault.Mode.NEVER)
-    val consentHistories: kotlin.collections.Map<kotlin.String, kotlin.collections.List<UserConsentHistory>>? = null,
+    val consentHistories: Map<String, List<UserConsentHistory>>? = null,
 
     /* Records of every enrollment (whether withdrawn or not) in every study for this participant. The key of this mapping is the studyId, and the value is the record of the enrollment. */
     @SerialName("enrollments")
     @EncodeDefault(EncodeDefault.Mode.NEVER)
-    val enrollments: kotlin.collections.Map<kotlin.String, EnrollmentInfo>? = null,
+    val enrollments: Map<String, EnrollmentInfo>? = null,
 
     /* True if the user has consented to all required consents, based on the user's most recent request info (client info, languages, data groups). May be null if this object was not constructed with consent histories, or if consent status is indeterminate.  */
     @SerialName("consented")
     @EncodeDefault(EncodeDefault.Mode.NEVER)
-    val consented: kotlin.Boolean? = null,
+    val consented: Boolean? = null,
 
     /* User's original time zone, as measured by the timezone used to request activities, as a string offset in ISO8601 format. Related to the v3 scheduling API, it is not always set or reliable. */
     @SerialName("timeZone")
     @EncodeDefault(EncodeDefault.Mode.NEVER)
-    val timeZone: kotlin.String? = null,
+    val timeZone: String? = null,
 
     /* StudyParticipant */
     @SerialName("type")
-    val type: kotlin.String? = null
+    val type: String? = null
 
-) {
-
-}
+)
 

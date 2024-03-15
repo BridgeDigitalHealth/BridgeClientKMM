@@ -67,16 +67,16 @@ internal data class UserScheduleData(
 
     companion object {
         fun union(left: UserScheduleData?, right: UserScheduleData?) : UserScheduleData? {
-            return if (left.isNullOrEmpty()) {
+            return if (left == null || left.isEmpty()) {
                 right
-            } else if (right.isNullOrEmpty()) {
+            } else if (right == null || right.isEmpty()) {
                 left
             } else {
-                var userScheduleData = UserScheduleData()
+                val userScheduleData = UserScheduleData()
                 userScheduleData.timestampedAvailability =
-                    left!!.timestampedAvailability.mostRecent(right!!.timestampedAvailability)
+                    left.timestampedAvailability.mostRecent(right.timestampedAvailability)
                 userScheduleData.timestampedSessionStartTimes =
-                    left!!.timestampedSessionStartTimes.mostRecent(right!!.timestampedSessionStartTimes)
+                    left.timestampedSessionStartTimes.mostRecent(right.timestampedSessionStartTimes)
                 userScheduleData
             }
         }

@@ -25,7 +25,7 @@ class AssessmentsApi(basePath: String = BASE_PATH, httpClient: HttpClient) : Abs
     /**
      * Get the JSON config for this assessment
      *
-     * @param guid A guid
+     * @param assessmentInfo The assessment info
      * @return AssessmentConfig
      */
     suspend fun getAssessmentConfig(assessmentInfo: AssessmentInfo) : AssessmentConfig {

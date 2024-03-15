@@ -4,7 +4,6 @@ import co.touchlab.stately.ensureNeverFrozen
 import io.ktor.client.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collect
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.sagebionetworks.bridge.kmm.shared.BridgeConfig
@@ -26,7 +25,7 @@ class AppConfigRepo(httpClient: HttpClient,
     }
 
 
-    internal var publicApi = PublicApi(
+    private var publicApi = PublicApi(
         httpClient = httpClient
     )
 

@@ -37,7 +37,7 @@ data class SessionInfo (
     val label: String,
 
     @SerialName("symbol")
-    val symbol: kotlin.String? = null,
+    val symbol: String? = null,
 
     @SerialName("performanceOrder")
     val performanceOrder: PerformanceOrder,

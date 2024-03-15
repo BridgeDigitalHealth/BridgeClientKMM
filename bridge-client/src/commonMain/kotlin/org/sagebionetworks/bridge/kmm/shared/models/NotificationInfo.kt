@@ -19,7 +19,7 @@ import kotlinx.serialization.SerialName
  * A notification to show to a participant as part of the execution of a scheduled session. 
  * @param notifyAt 
  * @param offset The time after a window starts or before it ends (based on the `notifyAt` property) when a notification should be shown to the user.
- * @param interval If a window lasts for more thatn twenty-four hours, a notification can be repeated on a daily repeat value. Only day values are allowed.
+ * @param interval If a window lasts for more than twenty-four hours, a notification can be repeated on a daily repeat value. Only day values are allowed.
  * @param allowSnooze Allow the participant to “snooze” a notification or reminder (dismiss it with some amount of time before it occurs again). Cannot be true if `notifyAt` is null.
  * @param message 
  * @param type NotificationInfo
@@ -31,7 +31,7 @@ data class NotificationInfo (
     /* The time after a window starts or before it ends (based on the `notifyAt` property) when a notification should be shown to the user. */
     @SerialName("offset")
     val offset: String? = null,
-    /* If a window lasts for more thatn twenty-four hours, a notification can be repeated on a daily repeat value. Only day values are allowed. */
+    /* If a window lasts for more than twenty-four hours, a notification can be repeated on a daily repeat value. Only day values are allowed. */
     @SerialName("interval")
     val interval: String? = null,
     /* Allow the participant to “snooze” a notification or reminder (dismiss it with some amount of time before it occurs again). Cannot be true if `notifyAt` is null. */

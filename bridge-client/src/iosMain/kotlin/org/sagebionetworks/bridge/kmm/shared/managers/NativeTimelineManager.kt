@@ -1,9 +1,10 @@
+@file:Suppress("unused", "MemberVisibilityCanBePrivate")
+
 package org.sagebionetworks.bridge.kmm.shared.managers
 
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.datetime.*
 import kotlinx.serialization.json.JsonElement

@@ -10,6 +10,7 @@ interface NativeLogWriter {
     fun log(severity: LogSeverity, message: String?, tag: String?, error: NSError?)
 }
 
+@Suppress("unused")
 object IOSLogger {
     fun addLogWriter(logWriter: NativeLogWriter) {
         Logger.addLogWriter(WrappedLogWriter(logWriter))
@@ -40,7 +41,7 @@ internal data class WrappedLogWriter(private val nativeLogWriter: NativeLogWrite
                 )
             }
             else {
-                logMessage.plus(throwable.toString())
+                logMessage += throwable.toString()
             }
         }
 

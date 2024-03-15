@@ -14,6 +14,7 @@ package org.sagebionetworks.bridge.kmm.shared.models
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonObject
 
 
 /**
@@ -25,19 +26,13 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class ParticipantData (
     /* A string containing the data to be saved for the participant data attribute. */
-    
     @SerialName("data")
-    val data: kotlinx.serialization.json.JsonObject,
+    val data: JsonObject,
     /* The identifier of the participant data. */
-    
     @SerialName("identifier")
-    val identifier: kotlin.String? = null,
+    val identifier: String? = null,
     /* ParticipantData */
-    
     @SerialName("type")
-    val type: kotlin.String? = null
-
-) {
-
-}
+    val type: String? = null
+)
 

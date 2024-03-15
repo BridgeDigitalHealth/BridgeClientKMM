@@ -1,5 +1,6 @@
 package org.sagebionetworks.bridge.kmm.shared.models
 
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
@@ -11,13 +12,14 @@ data class UploadMetadata(
     val eventTimestamp: String? = null,
     val startedOn: String? = null,
 ) {
+    @OptIn(ExperimentalSerializationApi::class)
     internal fun toJsonMap(): Map<String, JsonElement> {
         val jsonCoder = Json {
             ignoreUnknownKeys = true
             encodeDefaults = true
             explicitNulls = false
         }
-        return jsonCoder.encodeToJsonElement(UploadMetadata.serializer(),this).jsonObject.toMap()
+        return jsonCoder.encodeToJsonElement(serializer(),this).jsonObject.toMap()
     }
 }
 
@@ -42,12 +44,13 @@ data class UploadRequestMetadata(
         clientData = adherenceRecord.clientData
     )
 
+    @OptIn(ExperimentalSerializationApi::class)
     internal fun toJsonMap(): Map<String, JsonElement> {
         val jsonCoder = Json {
             ignoreUnknownKeys = true
             encodeDefaults = true
             explicitNulls = false
         }
-        return jsonCoder.encodeToJsonElement(UploadRequestMetadata.serializer(),this).jsonObject.toMap()
+        return jsonCoder.encodeToJsonElement(serializer(),this).jsonObject.toMap()
     }
 }

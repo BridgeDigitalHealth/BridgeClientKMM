@@ -64,10 +64,10 @@ data class ScheduledSession (
     val persistent: Boolean = false,
 
     @SerialName("studyBurstId")
-    val studyBurstId: kotlin.String? = null,
+    val studyBurstId: String? = null,
 
     @SerialName("studyBurstNum")
-    val studyBurstNum: kotlin.Int? = null,
+    val studyBurstNum: Int? = null,
 
     @SerialName("timeWindowGuid")
     val timeWindowGuid: String? = null,

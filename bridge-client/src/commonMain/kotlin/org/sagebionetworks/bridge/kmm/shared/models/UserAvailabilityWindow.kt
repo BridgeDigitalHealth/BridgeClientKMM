@@ -59,7 +59,7 @@ data class UserAvailabilityWindow(
      * Calculate evenly spaced session times throughout the repeat window.
      */
     internal fun evenSpacedSessionTimes(repeatTimeWindow: RepeatTimeWindow) : CalculatedScheduleWindows
-        = evenSpacedSessionTimes(repeatTimeWindow.count, repeatTimeWindow.expiration)
+        = evenSpacedSessionTimes(repeatTimeWindow.size, repeatTimeWindow.expiration)
 
     private fun evenSpacedSessionTimes(sessionsPerDay: Int, windowDuration: DateTimePeriod) : CalculatedScheduleWindows {
         val totalAvailabilityInMinutes = availabilityInMinutes()

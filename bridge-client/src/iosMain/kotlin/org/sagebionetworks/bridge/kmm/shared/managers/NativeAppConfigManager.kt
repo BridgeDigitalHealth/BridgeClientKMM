@@ -1,8 +1,9 @@
+@file:Suppress("unused")
+
 package org.sagebionetworks.bridge.kmm.shared.managers
 
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject

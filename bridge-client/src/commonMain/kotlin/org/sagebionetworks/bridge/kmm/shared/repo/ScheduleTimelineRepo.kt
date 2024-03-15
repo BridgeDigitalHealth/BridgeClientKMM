@@ -16,7 +16,7 @@ import org.sagebionetworks.bridge.kmm.shared.models.*
 import kotlin.time.ExperimentalTime
 
 class ScheduleTimelineRepo(internal val adherenceRecordRepo: AdherenceRecordRepo,
-                           internal val assessmentConfigRepo: AssessmentConfigRepo,
+                           private val assessmentConfigRepo: AssessmentConfigRepo,
                            httpClient: HttpClient,
                            databaseHelper: ResourceDatabaseHelper,
                            backgroundScope: CoroutineScope,
@@ -82,7 +82,7 @@ class ScheduleTimelineRepo(internal val adherenceRecordRepo: AdherenceRecordRepo
         var schedule = scheduleApi.getParticipantScheduleForSelf(studyId)
         schedule = scheduleMutator?.mutateParticipantSchedule(schedule) ?: schedule
         participantScheduleDatabase.cacheParticipantSchedule(studyId, schedule)
-        backgroundScope.launch() {
+        backgroundScope.launch {
             schedule.assessments?.let {
                 assessmentConfigRepo.loadAndCacheConfigs(it)
             }
@@ -269,7 +269,7 @@ data class ScheduledAssessmentReference (
     val adherenceRecordList: List<AdherenceRecord>,
 ) {
     val isCompleted = adherenceRecordList.any { it.finishedOn != null }
-    val isDeclined = !isCompleted && adherenceRecordList.any { it.declined == true }
+    val isDeclined = !isCompleted && adherenceRecordList.any { it.declined }
 
     fun history(): List<AssessmentHistoryRecord> {
         return adherenceRecordList.mapNotNull { record ->

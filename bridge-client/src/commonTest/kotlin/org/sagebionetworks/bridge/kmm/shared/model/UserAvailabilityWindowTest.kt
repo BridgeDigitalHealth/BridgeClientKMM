@@ -117,7 +117,7 @@ class UserAvailabilityWindowTest : BaseTest() {
         val repeatTimeWindow = RepeatTimeWindow(
             availabilityWindow = availabilityWindow,
             expiration = DateTimePeriod(hours = 1, minutes = 15),
-            count = 6
+            size = 6
         )
 
         val calculated = availabilityWindow.evenSpacedSessionTimes(repeatTimeWindow)

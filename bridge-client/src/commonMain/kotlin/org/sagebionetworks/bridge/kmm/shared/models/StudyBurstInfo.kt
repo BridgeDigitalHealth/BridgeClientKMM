@@ -49,9 +49,7 @@ data class StudyBurstInfo (
 
     /* StudyBurstInfo */
     @SerialName("type")
-    val type: kotlin.String? = null
+    val type: String? = null
 
-) {
-
-}
+)
 

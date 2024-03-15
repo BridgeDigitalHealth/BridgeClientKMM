@@ -33,7 +33,7 @@ internal data class CalculatedScheduleWindows(
         // If the number of previous times does not match the number of start times, then the times are not valid
         if (previousTimes.size != startTimes.size) return false
         // Create a set of time windows
-        var windows = startTimes.map { Pair(it, it.plusMinutes(spacing)) }.toMutableSet()
+        val windows = startTimes.map { Pair(it, it.plusMinutes(spacing)) }.toMutableSet()
         // Remove any previous times from the set of windows
         previousTimes.forEach { prev ->
             windows.firstOrNull { it.contains(prev) }?.run {

@@ -8,7 +8,6 @@ import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.LocalTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
-import kotlinx.serialization.EncodeDefault
 import org.sagebionetworks.bridge.kmm.shared.models.CalculatedScheduleWindows
 import org.sagebionetworks.bridge.kmm.shared.models.ParticipantSchedule
 import org.sagebionetworks.bridge.kmm.shared.models.RepeatTimeWindow
@@ -279,7 +278,7 @@ internal fun List<ScheduledSession>.mapByDay() : List<ScheduleDayTuple> {
             repeatTimeWindow = RepeatTimeWindow(
                 availabilityWindow = availabilityWindow,
                 expiration = expiration,
-                count = sorted.size
+                size = sorted.size
             )
         )
     }
@@ -293,5 +292,4 @@ internal fun <T> List<T>.ifSame(valueIfEmpty: T? = null) : T? {
         else -> null
     }
 }
-
 
