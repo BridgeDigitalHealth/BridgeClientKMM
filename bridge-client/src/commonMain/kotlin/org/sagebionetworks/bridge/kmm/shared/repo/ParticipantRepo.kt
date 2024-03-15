@@ -173,7 +173,7 @@ class ParticipantRepo(httpClient: HttpClient,
         /* Data used to set up custom schedule times. */
         internal var userScheduleData: UserScheduleData?,
 
-        // wrap the client data to allow both the app to store app-specific properties on the
+        // Wrap the client data to allow both the app to store app-specific properties on the
         // participant, as well as allowing a "future" model to include these outside the client
         // data blob.
         internal var appClientData: JsonElement?,

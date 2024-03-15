@@ -65,7 +65,7 @@ data class UserAvailabilityWindow(
         val totalAvailabilityInMinutes = availabilityInMinutes()
         val desiredSessionWindow = totalAvailabilityInMinutes / sessionsPerDay
         val minimumSessionWindow = windowDuration.totalMinutes
-        // if the availability is less that the required availability then use the minimumSessionWindow
+        // if the availability is less than the required availability then use the minimumSessionWindow
         val actualSessionWindow = max(desiredSessionWindow, minimumSessionWindow)
         val spacing = actualSessionWindow - minimumSessionWindow
         val times = mutableListOf<LocalTime>()
