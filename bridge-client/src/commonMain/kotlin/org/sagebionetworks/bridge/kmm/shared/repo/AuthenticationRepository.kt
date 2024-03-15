@@ -123,14 +123,14 @@ class AuthenticationRepository(
      * @return Boolean
      */
     suspend fun requestPhoneSignIn(number: String, regionCode: String) : ResourceResult<Boolean> {
-        try {
+        return try {
             val phone = Phone(number, regionCode)
             val phoneSignInRequest = PhoneSignInRequest(bridgeConfig.appId, phone)
             authenticationApi.requestPhoneSignIn(phoneSignInRequest)
-            return ResourceResult.Success(true, ResourceStatus.SUCCESS)
+            ResourceResult.Success(true, ResourceStatus.SUCCESS)
         } catch (err: Throwable) {
             Logger.w("Error requesting phone sign-in: $err")
-            return ResourceResult.Failed(ResourceStatus.FAILED, getHttpStatusCode(err))
+            ResourceResult.Failed(ResourceStatus.FAILED, getHttpStatusCode(err))
         }
     }
 
@@ -143,14 +143,14 @@ class AuthenticationRepository(
      * @return Message
      */
     suspend fun resendPhoneVerification(number: String, regionCode: String) : ResourceResult<Boolean> {
-        try {
+        return try {
             val phone = Phone(number, regionCode)
             val identifier = Identifier(bridgeConfig.appId, phone=phone)
             authenticationApi.resendPhoneVerification(identifier)
-            return ResourceResult.Success(true, ResourceStatus.SUCCESS)
+            ResourceResult.Success(true, ResourceStatus.SUCCESS)
         } catch (err: Throwable) {
             Logger.w("Error calling resendPhoneVerification: $err")
-            return ResourceResult.Failed(ResourceStatus.FAILED, getHttpStatusCode(err))
+            ResourceResult.Failed(ResourceStatus.FAILED, getHttpStatusCode(err))
         }
     }
 
@@ -163,16 +163,16 @@ class AuthenticationRepository(
      * @return ResourceResult<UserSessionInfo>
      */
     suspend fun signInPhone(token: String, number: String, regionCode: String) : ResourceResult<UserSessionInfo> {
-        try {
+        return try {
             val phone = Phone(number, regionCode)
             val phoneSignin = PhoneSignin(bridgeConfig.appId, phone, token)
             val userSession = authenticationApi.signInViaPhone(phoneSignin)
             updateCachedSession(null, userSession)
-            return ResourceResult.Success(userSession, ResourceStatus.SUCCESS)
+            ResourceResult.Success(userSession, ResourceStatus.SUCCESS)
         } catch (err: Throwable) {
             database.removeResource(USER_SESSION_ID, ResourceType.USER_SESSION_INFO, APP_WIDE_STUDY_ID)
             Logger.w("Error signInPhone: $err")
-            return ResourceResult.Failed(ResourceStatus.FAILED, getHttpStatusCode(err))
+            ResourceResult.Failed(ResourceStatus.FAILED, getHttpStatusCode(err))
         }
     }
 
@@ -233,17 +233,17 @@ class AuthenticationRepository(
     }
 
     private suspend fun signIn(signIn: SignIn) : ResourceResult<UserSessionInfo> {
-        try {
+        return try {
             val userSession = authenticationApi.signIn(signIn)
             if (signIn.password != null && bridgeConfig.cacheCredentials) {
                 storeCredentials(signIn.password)
             }
             updateCachedSession(null, userSession)
-            return ResourceResult.Success(userSession, ResourceStatus.SUCCESS)
+            ResourceResult.Success(userSession, ResourceStatus.SUCCESS)
         } catch (err: Throwable) {
             database.removeResource(USER_SESSION_ID, ResourceType.USER_SESSION_INFO, APP_WIDE_STUDY_ID)
             Logger.w("Error signIn: $err")
-            return ResourceResult.Failed(ResourceStatus.FAILED, getHttpStatusCode(err))
+            ResourceResult.Failed(ResourceStatus.FAILED, getHttpStatusCode(err))
         }
     }
 
@@ -275,7 +275,7 @@ class AuthenticationRepository(
 
     private suspend fun signUp(signUp: SignUp) : Boolean {
         try {
-            val message = authenticationApi.signUp(signUp)
+            authenticationApi.signUp(signUp)
             return true
         } catch (err: Throwable) {
             Logger.w("Error signUp: $err")

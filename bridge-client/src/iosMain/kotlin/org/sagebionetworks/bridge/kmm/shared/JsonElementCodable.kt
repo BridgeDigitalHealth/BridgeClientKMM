@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 package org.sagebionetworks.bridge.kmm.shared
 
 import kotlinx.serialization.json.Json

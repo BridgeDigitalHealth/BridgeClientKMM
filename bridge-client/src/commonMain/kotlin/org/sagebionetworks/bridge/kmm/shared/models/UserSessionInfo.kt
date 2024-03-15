@@ -102,7 +102,7 @@ data class UserSessionInfo (
     val consentStatuses: Map<String, ConsentStatus>? = null,
     /* Records of every enrollment (whether withdrawn or not) in every study for this participant. The key of this mapping is the studyId, and the value is the record of the enrollment. */
     @SerialName("enrollments")
-    val enrollments: kotlin.collections.Map<kotlin.String, EnrollmentInfo>? = null,
+    val enrollments: Map<String, EnrollmentInfo>? = null,
     /* The identifier of the organization this account is a member of (this will be an administrative account and not a study participant). */
     @SerialName("orgMembership")
     val orgMembership: String? = null,

@@ -148,11 +148,11 @@ public struct CustomScrollView<Content : View>: View {
         }
     }
     
-    struct ContentView<Content : View>: View {
-        private let content: Content
+    struct ContentView<InnerContent : View>: View {
+        private let content: InnerContent
         @Binding private var contentHeight: CGFloat
         
-        public init(height: Binding<CGFloat>, _ content: @escaping () -> Content) {
+        public init(height: Binding<CGFloat>, _ content: @escaping () -> InnerContent) {
             self._contentHeight = height
             self.content = content()
         }

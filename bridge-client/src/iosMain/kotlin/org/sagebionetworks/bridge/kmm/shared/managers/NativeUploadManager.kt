@@ -1,7 +1,8 @@
+@file:Suppress("unused")
+
 package org.sagebionetworks.bridge.kmm.shared.managers
 
 import co.touchlab.kermit.Logger
-import co.touchlab.kermit.Severity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
@@ -13,7 +14,6 @@ import org.koin.core.component.inject
 import org.sagebionetworks.bridge.kmm.shared.models.S3UploadSession
 import org.sagebionetworks.bridge.kmm.shared.models.UploadFile
 import org.sagebionetworks.bridge.kmm.shared.models.UploadFileId
-import org.sagebionetworks.bridge.kmm.shared.models.getUploadFileResourceId
 import org.sagebionetworks.bridge.kmm.shared.models.getUploadSessionResourceId
 import org.sagebionetworks.bridge.kmm.shared.repo.*
 

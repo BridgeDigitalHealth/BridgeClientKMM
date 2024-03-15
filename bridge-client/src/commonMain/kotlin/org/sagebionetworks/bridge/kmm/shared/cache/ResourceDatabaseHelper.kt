@@ -12,12 +12,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.datetime.Clock
-import kotlinx.datetime.LocalDateTime
-import kotlinx.datetime.TimeZone
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonElement
 import org.sagebionetworks.bridge.kmm.shared.apis.EtagStorageCache
 import org.sagebionetworks.bridge.kmm.shared.models.UploadFile
 import org.sagebionetworks.bridge.kmm.shared.models.getUploadFileResourceId
@@ -38,9 +34,9 @@ class ResourceDatabaseHelper(sqlDriver: SqlDriver) : EtagStorageCache {
         sqlDriver,
         AdherenceRecords.Adapter(EnumColumnAdapter()),
         JsonData.Adapter(
-            jsonAdapter = serializableColumnAdapter<JsonElement>(),
-            expireAdapter = serializableColumnAdapter<LocalDateTime>(),
-            timeZoneAdapter = serializableColumnAdapter<TimeZone>()
+            jsonAdapter = serializableColumnAdapter(),
+            expireAdapter = serializableColumnAdapter(),
+            timeZoneAdapter = serializableColumnAdapter()
         ),
         Resource.Adapter(EnumColumnAdapter(), EnumColumnAdapter())
     )

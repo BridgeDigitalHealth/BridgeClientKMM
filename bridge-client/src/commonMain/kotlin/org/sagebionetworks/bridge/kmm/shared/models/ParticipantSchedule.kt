@@ -56,7 +56,5 @@ data class ParticipantSchedule (
     @SerialName("type")
     val type: String? = null
 
-) {
-
-}
+)
 

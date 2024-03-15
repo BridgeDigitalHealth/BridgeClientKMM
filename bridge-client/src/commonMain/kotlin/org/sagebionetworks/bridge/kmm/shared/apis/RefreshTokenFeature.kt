@@ -39,8 +39,8 @@ internal class RefreshTokenFeature(
 
         override fun prepare(block: Config.() -> Unit) = Config().apply(block).build()
 
-        override fun install(feature: RefreshTokenFeature, scope: HttpClient) {
-            scope.receivePipeline.intercept(HttpReceivePipeline.After) { param ->
+        override fun install(plugin: RefreshTokenFeature, scope: HttpClient) {
+            scope.receivePipeline.intercept(HttpReceivePipeline.After) {
                 //Only applicable if we are making a call to Bridge server
                 if (subject.request.url.host.contains(AbstractApi.BRIDGE_SERVER_CHECK)) {
                     if (subject.status != HttpStatusCode.Unauthorized) {
@@ -52,7 +52,7 @@ internal class RefreshTokenFeature(
 
                     // If token of the request isn't actual, then token has already been updated and
                     // let's just to try repeat request.
-                    if (!feature.isTokenSameOrNull(subject.request)) {
+                    if (!plugin.isTokenSameOrNull(subject.request)) {
                         refreshTokenHttpFeatureMutex.unlock()
                         val requestBuilder = HttpRequestBuilder().takeFrom(subject.request)
                         // Remove the User-Agent header so that UserAgent plugin doesn't add a second one
@@ -65,7 +65,7 @@ internal class RefreshTokenFeature(
 
                     // Else if token of the request is actual (same as in the storage), then need to send
                     // refresh request.
-                    if (feature.updateTokenHandler.invoke()) {
+                    if (plugin.updateTokenHandler.invoke()) {
                         // If the request refresh was successful, then let's just to try repeat request
                         refreshTokenHttpFeatureMutex.unlock()
                         val requestBuilder = HttpRequestBuilder().takeFrom(subject.request)

@@ -14,15 +14,12 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import org.koin.core.component.getScopeName
 import org.sagebionetworks.bridge.kmm.shared.BridgeConfig
 import org.sagebionetworks.bridge.kmm.shared.apis.SchedulesV2Api
 import org.sagebionetworks.bridge.kmm.shared.buildClientData
 import org.sagebionetworks.bridge.kmm.shared.cache.*
-import org.sagebionetworks.bridge.kmm.shared.di.platformModule
 import org.sagebionetworks.bridge.kmm.shared.models.AdherenceRecord
 import org.sagebionetworks.bridge.kmm.shared.models.AdherenceRecordList
 import org.sagebionetworks.bridge.kmm.shared.models.AdherenceRecordsSearch
@@ -39,15 +36,15 @@ class AdherenceRecordRepo(httpClient: HttpClient,
     }
 
 
-    internal var scheduleV2Api = SchedulesV2Api(
+    private var scheduleV2Api = SchedulesV2Api(
         httpClient = httpClient
     )
 
     private val dbQuery = databaseHelper.database.participantScheduleQueries
 
     fun getAllCompletedCachedAssessmentAdherence(studyId: String): Flow <List<AssessmentHistoryRecord>> {
-        return dbQuery.completedAssessmentAdherence(studyId).asFlow().mapToList(Dispatchers.Default).mapNotNull {
-            it.map {
+        return dbQuery.completedAssessmentAdherence(studyId).asFlow().mapToList(Dispatchers.Default).mapNotNull { list ->
+            list.map {
                 val adherenceRecord = Json.decodeFromString<AdherenceRecord>(it.adherenceJson!!)
                 AssessmentHistoryRecord(
                     instanceGuid = it.assessmentInstanceGuid,
@@ -66,8 +63,8 @@ class AdherenceRecordRepo(httpClient: HttpClient,
      * Get all of the locally cached [AdherenceRecord]s.
      */
     fun getAllCachedAdherenceRecords(studyId: String): Flow<Map<String, List<AdherenceRecord>>> {
-        return dbQuery.allAdherence(studyId).asFlow().mapToList(Dispatchers.Default).mapNotNull {
-            it.map {
+        return dbQuery.allAdherence(studyId).asFlow().mapToList(Dispatchers.Default).mapNotNull { list ->
+            list.map {
                 Json.decodeFromString<AdherenceRecord>(it.adherenceJson)
             }.groupBy { adherenceRecord ->
                 adherenceRecord.instanceGuid

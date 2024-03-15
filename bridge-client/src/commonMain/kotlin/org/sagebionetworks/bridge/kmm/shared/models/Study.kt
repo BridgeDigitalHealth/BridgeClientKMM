@@ -15,6 +15,7 @@ import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.Serializable
 
 import kotlinx.serialization.SerialName
+import org.sagebionetworks.bridge.kmm.shared.repo.decodeObjectWithKey
 
 /**
  * A study (an outside organization providing participants for a study). 
@@ -118,3 +119,5 @@ data class Study (
     val type: String? = null
 )
 
+val Study.scheduleConfig: ScheduleConfig?
+    get() = clientData?.decodeObjectWithKey("scheduleConfig", StudyScheduleConfig.serializer())

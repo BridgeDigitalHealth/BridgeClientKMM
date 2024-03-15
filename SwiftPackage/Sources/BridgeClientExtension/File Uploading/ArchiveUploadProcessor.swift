@@ -99,7 +99,7 @@ final class ArchiveUploadProcessor {
     }
 
     @MainActor
-    private func _uploadEncrypted(id: String, url: URL, schedule: AssessmentScheduleInfo?, startedOn: Date?) async {
+    private func _uploadEncrypted(id: String, url: URL, schedule: AdherenceRecordId?, startedOn: Date?) async {
         let success = await uploadManager.uploadEncryptedArchive(fileUrl: url, schedule: schedule, startedOn: startedOn)
         if (success) {
             // Only if the file was successfully queued for upload should the original file be deleted.
@@ -124,7 +124,7 @@ final class ArchiveUploadProcessor {
 /// Use a protocol to allow for unit tests to mock the Upload Manager.
 protocol BridgeUploader : NSObjectProtocol {
     var isArchiving: Bool { get set }
-    @MainActor func uploadEncryptedArchive(fileUrl: URL, schedule: AssessmentScheduleInfo?, startedOn: Date?) async -> Bool
+    @MainActor func uploadEncryptedArchive(fileUrl: URL, schedule: AdherenceRecordId?, startedOn: Date?) async -> Bool
     @MainActor func upload(fileUrl: URL, contentType: String, encrypted: Bool, metadata: UploadMetadata?, s3UploadType: S3UploadType) async -> Bool
 }
 

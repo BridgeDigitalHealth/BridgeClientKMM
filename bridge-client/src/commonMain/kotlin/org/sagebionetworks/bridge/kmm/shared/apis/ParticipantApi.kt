@@ -5,8 +5,6 @@ package org.sagebionetworks.bridge.kmm.shared.apis
 
 
 import io.ktor.client.*
-import io.ktor.client.request.*
-import io.ktor.http.*
 import kotlinx.datetime.Instant
 import org.sagebionetworks.bridge.kmm.shared.models.*
 import org.sagebionetworks.bridge.kmm.shared.models.Message

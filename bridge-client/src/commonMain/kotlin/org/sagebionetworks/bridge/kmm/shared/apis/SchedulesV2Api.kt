@@ -30,7 +30,7 @@ internal class SchedulesV2Api(basePath: String = BASE_PATH, httpClient: HttpClie
      * @return ParticipantSchedule
      */
     suspend fun getParticipantScheduleForSelf(studyId: String, clientTimeZone: String = TimeZone.currentSystemDefault().toString()): ParticipantSchedule {
-        val params = clientTimeZone?.let{mapOf("clientTimeZone" to clientTimeZone)}
+        val params = mapOf("clientTimeZone" to clientTimeZone)
         return getData("v5/studies/$studyId/participants/self/schedule", queryParams = params)
     }
 

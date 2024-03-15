@@ -25,15 +25,13 @@ data class PhoneSignInRequest (
     /* The identifier for the participant's app. */
     
     @SerialName("appId")
-    val appId: kotlin.String,
+    val appId: String,
     
     @SerialName("phone")
     val phone: Phone,
     /* PhoneSignInRequest */
     
     @SerialName("type")
-    val type: kotlin.String? = null
+    val type: String? = null
 
-) {
-
-}
+)

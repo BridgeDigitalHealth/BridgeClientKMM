@@ -15,7 +15,7 @@ import org.sagebionetworks.bridge.kmm.shared.cache.ResourceType
 import org.sagebionetworks.bridge.kmm.shared.models.StudyActivityEventList
 import org.sagebionetworks.bridge.kmm.shared.models.StudyActivityEventRequest
 
-class ActivityEventsRepo(httpClient: HttpClient, databaseHelper: ResourceDatabaseHelper, backgroundScope: CoroutineScope, val scheduleTimelineRepo: ScheduleTimelineRepo) :
+class ActivityEventsRepo(httpClient: HttpClient, databaseHelper: ResourceDatabaseHelper, backgroundScope: CoroutineScope, private val scheduleTimelineRepo: ScheduleTimelineRepo) :
     AbstractResourceRepo(databaseHelper, backgroundScope) {
 
     internal companion object {

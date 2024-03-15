@@ -30,29 +30,27 @@ import kotlinx.serialization.SerialName
  * @param type PropertyInfo
  */
 @Serializable
-public data class PropertyInfo (
+data class PropertyInfo (
+
     /* The property name of the property on the JSON object that can be edited. */
-    
     @SerialName("propName")
-    val propName: kotlin.String,
+    val propName: String,
+
     /* A short label for the property. */
-    
     @SerialName("label")
-    val label: kotlin.String,
+    val label: String,
+
     /* A longer description of the property and the allowable values that it can take. */
-    
     @SerialName("description")
-    val description: kotlin.String? = null,
+    val description: String? = null,
+
     /* A type hint to a UI editor for this property. The value is not constrained to support complex types, but we suggest 'string', 'number', or 'boolean' as basic values to support with editing tools. */
-    
     @SerialName("propType")
-    val propType: kotlin.String? = null,
+    val propType: String? = null,
+
     /* PropertyInfo */
-    
     @SerialName("type")
-    val type: kotlin.String? = null
+    val type: String? = null
 
-) {
-
-}
+)
 

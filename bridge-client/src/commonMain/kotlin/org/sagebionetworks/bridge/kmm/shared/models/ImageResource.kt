@@ -23,7 +23,7 @@ import kotlinx.serialization.Serializable
  * @param labels A collection of labels for this ImageResource. Only one label can be included for each language, and if the user’s language cannot be selected, English will be selected as a default.
  */
 @Serializable
-public data class ImageResource (
+data class ImageResource (
 
     /* The name of the image to display. */
     @SerialName("name")
@@ -41,7 +41,5 @@ public data class ImageResource (
     @SerialName("labels")
     val labels: List<Label>? = null
 
-) {
-
-}
+)
 

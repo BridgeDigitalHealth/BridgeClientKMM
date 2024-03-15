@@ -21,17 +21,15 @@ import kotlinx.serialization.SerialName
  * @param endDate Start date of the date range (YYYY-MM-DD).
  */
 @Serializable
-public data class DateRange (
+data class DateRange (
     /* Start date of the date range (YYYY-MM-DD). */
     
     @SerialName("startDate")
-    val startDate: kotlin.String? = null,
+    val startDate: String? = null,
     /* Start date of the date range (YYYY-MM-DD). */
     
     @SerialName("endDate")
-    val endDate: kotlin.String? = null
+    val endDate: String? = null
 
-) {
-
-}
+)
 

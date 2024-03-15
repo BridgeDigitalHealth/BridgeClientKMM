@@ -22,7 +22,7 @@ fun httpClientModule(enableNetworkLogs: Boolean) = module {
 
     //HttpClient configured for use with AuthenticationAPI, it needs its own HttpClient so as not to
     // include the re-authentication feature found in DefaultHttpClient, which would cause a dependency loop
-    single<HttpClient>(named("authHttpClient")) { createAuthHttpClient(enableNetworkLogs, get(), get()) }
+    single(named("authHttpClient")) { createAuthHttpClient(enableNetworkLogs, get(), get()) }
 
 }
 
@@ -108,7 +108,7 @@ internal fun HttpClient.appendDefaultConfig(
         // Check if the cached session token matches the one used in the request, or is null.
         isTokenSameOrNull = fun(request: HttpRequest): Boolean {
             return authenticationRepository.session()?.sessionToken?.let {
-                return it.isNotEmpty() && it.equals(request.headers.get(sessionTokenHeaderKey))
+                return it.isNotEmpty() && it == request.headers[sessionTokenHeaderKey]
             } ?: true
         }
     }

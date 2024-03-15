@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 package org.sagebionetworks.bridge.kmm.shared.managers
 
 import kotlinx.coroutines.MainScope
@@ -21,14 +23,14 @@ class NativeReportManager (
     private val scope = MainScope()
 
     fun fetchReports(identifier: String, startDateTime: NSDate, endDateTime: NSDate, callBack: (List<NativeParticipantDataRecord>) -> Unit) {
-        _fetchReports(identifier, startDateTime, endDateTime, true, callBack)
+        fallthroughFetchReports(identifier, startDateTime, endDateTime, true, callBack)
     }
 
     fun fetchCachedReports(identifier: String, startDateTime: NSDate, endDateTime: NSDate, callBack: (List<NativeParticipantDataRecord>) -> Unit) {
-        _fetchReports(identifier, startDateTime, endDateTime, false, callBack)
+        fallthroughFetchReports(identifier, startDateTime, endDateTime, false, callBack)
     }
 
-    private fun _fetchReports(identifier: String, startDateTime: NSDate, endDateTime: NSDate, loadFromServer: Boolean, callBack: (List<NativeParticipantDataRecord>) -> Unit) {
+    private fun fallthroughFetchReports(identifier: String, startDateTime: NSDate, endDateTime: NSDate, loadFromServer: Boolean, callBack: (List<NativeParticipantDataRecord>) -> Unit) {
         scope.launch {
             val lowerBound = startDateTime.toKotlinInstant()
             val upperBound = endDateTime.toKotlinInstant()

@@ -22,6 +22,9 @@ import kotlinx.serialization.SerialName
 @Serializable
 enum class NotificationType(val serialName: String? = null) {
 
+    @SerialName("before_burst_start")
+    BEFORE_BURST_START,
+
     @SerialName("after_window_start")
     AFTER_WINDOW_START,
 

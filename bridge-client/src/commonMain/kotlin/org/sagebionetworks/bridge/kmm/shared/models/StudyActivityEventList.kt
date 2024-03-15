@@ -23,8 +23,6 @@ import kotlinx.serialization.SerialName
 data class StudyActivityEventList (
     @SerialName("items")
     val items: List<StudyActivityEvent>? = null,
-    //@SerialName("requestParams")
-    //val requestParams: RequestParams? = null,
     /* ResourceList */
     @SerialName("type")
     val type: String? = null

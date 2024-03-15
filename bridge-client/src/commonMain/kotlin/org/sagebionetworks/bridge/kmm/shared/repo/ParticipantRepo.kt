@@ -4,14 +4,18 @@ import co.touchlab.kermit.Logger
 import co.touchlab.stately.ensureNeverFrozen
 import io.ktor.client.*
 import io.ktor.client.plugins.*
-import io.ktor.http.*
 import io.ktor.util.network.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
+import kotlinx.serialization.DeserializationStrategy
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.encodeToJsonElement
+import kotlinx.serialization.json.jsonObject
 import org.sagebionetworks.bridge.kmm.shared.apis.ParticipantApi
 import org.sagebionetworks.bridge.kmm.shared.cache.*
 import org.sagebionetworks.bridge.kmm.shared.models.*
@@ -27,7 +31,7 @@ class ParticipantRepo(httpClient: HttpClient,
         ensureNeverFrozen()
     }
 
-    internal var participantApi = ParticipantApi(
+    private var participantApi = ParticipantApi(
         httpClient = httpClient
     )
 
@@ -36,13 +40,29 @@ class ParticipantRepo(httpClient: HttpClient,
      * and trigger a background process to update the Bridge server.
      */
     fun updateParticipant(record: UpdateParticipantRecord) {
+        val previousSession = authenticationRepo.session()
+        if (previousSession == null) {
+            // TODO: syoung 03/10/2024 Um, huh? does this mean the participant is signed out and the update should be ignored?
+            Logger.e("Attempting to update a participant record for a signed-out user.")
+            return
+        }
+
+        // Merge the client data that might be stored by the app with the client data that is stored
+        // by schedule mutation.
+        val clientData = try {
+            mergeClientData(previousSession, record)
+        } catch (throwable: Throwable) {
+            Logger.e("Failed to encode `UserScheduleData`", throwable)
+            null
+        }
+
         // Update UserSessionInfo resource and mark as needing update
-        val userSessionInfo = authenticationRepo.session()?.copy(
+        val userSessionInfo = previousSession.copy(
             firstName = record.firstName,
             lastName = record.lastName,
             sharingScope = record.sharingScope,
             dataGroups = record.dataGroups,
-            clientData = record.clientData,
+            clientData = clientData,
             email = record.email,
             phone = record.phone
         )
@@ -60,6 +80,22 @@ class ParticipantRepo(httpClient: HttpClient,
         backgroundScope.launch {
             processLocalUpdates()
         }
+    }
+
+    internal fun mergeClientData(previousSession: UserSessionInfo, record: UpdateParticipantRecord) : JsonElement? {
+        // Merge the client data that might be stored by the app with the client data that is stored
+        // by schedule mutation.
+        val clientDataMap : MutableMap <String, JsonElement> =
+            record.appClientData?.jsonObject?.toMutableMap() ?: mutableMapOf()
+        val userScheduleData = UserScheduleData.union(record.userScheduleData, previousSession.userScheduleData)
+        if (!userScheduleData.isNullOrEmpty()) {
+            Json.encodeToJsonElement(userScheduleData).jsonObject.let {
+                it.entries.forEach { pair ->
+                    clientDataMap[pair.key] = pair.value
+                }
+            }
+        }
+        return if (clientDataMap.isEmpty()) null else JsonObject(clientDataMap)
     }
 
     suspend fun createConsentSignature(subpopulationGuid: String): ResourceResult<UserSessionInfo> {
@@ -130,25 +166,44 @@ class ParticipantRepo(httpClient: HttpClient,
         var sharingScope: SharingScope? = null,
         /* The data groups set for this user. Data groups must be strings that are defined in the list of all valid data groups for the app, as part of the app object.   */
         val dataGroups: MutableList<String>? = null,
-        /* Client data for a user should be in a syntactically valid JSON format. It will be returned as is to the client (as JSON).  */
-        var clientData: JsonElement? = null,
         /* The user's email. */
         var email: String? = null,
-        var phone: Phone? = null
+        var phone: Phone? = null,
+
+        /* Data used to set up custom schedule times. */
+        internal var userScheduleData: UserScheduleData?,
+
+        // Wrap the client data to allow both the app to store app-specific properties on the
+        // participant, as well as allowing a "future" model to include these outside the client
+        // data blob.
+        internal var appClientData: JsonElement?,
     ) {
 
-        internal fun toStudyParticipantRecord() : StudyParticipant {
-            return StudyParticipant(
-                id = id,
-                firstName = firstName,
-                lastName = lastName,
-                sharingScope = sharingScope,
-                dataGroups = dataGroups,
-                clientData = clientData,
-                email = email,
-                phone = phone
-            )
-        }
+        @Deprecated("This is included for reverse-compatibility to older apps that use the schedule mutator.")
+        var clientData: JsonElement?
+            get() = appClientData
+            set(newValue) {
+                // Look to see if this is an old schedule mutator implementation and store the
+                // properties from it to the parsed out schedule data.
+                val newScheduleData = newValue.decodeObject(UserScheduleData.serializer())
+                if (!newScheduleData.isNullOrEmpty()) {
+                    newScheduleData!!.setTimestampsIfNeeded()
+                    userScheduleData = newScheduleData
+                }
+                appClientData = newValue
+            }
+
+        /**
+         * Set the participant's availability window.
+         */
+        var availability : UserAvailabilityWindow?
+            get() = userScheduleData?.availability
+            set(newValue) {
+                if (userScheduleData == null) {
+                    userScheduleData = UserScheduleData()
+                }
+                userScheduleData!!.availability = newValue
+            }
 
         companion object {
 
@@ -163,16 +218,60 @@ class ParticipantRepo(httpClient: HttpClient,
                     lastName = session.lastName,
                     sharingScope = session.sharingScope,
                     dataGroups = session.dataGroups?.toMutableList(),
-                    clientData = session.clientData,
                     email = session.email,
-                    phone = session.phone
+                    phone = session.phone,
+                    userScheduleData = session.userScheduleData,
+                    appClientData = session.clientData,
                 )
             }
 
             internal fun getStudyParticipant(session: UserSessionInfo) : StudyParticipant {
-                return getUpdateParticipantRecord(session).toStudyParticipantRecord()
+                return StudyParticipant(
+                    id = session.id,
+                    firstName = session.firstName,
+                    lastName = session.lastName,
+                    sharingScope = session.sharingScope,
+                    dataGroups = session.dataGroups?.toMutableList(),
+                    email = session.email,
+                    phone = session.phone,
+                    clientData = session.clientData,
+                )
             }
 
         }
     }
 }
+
+@OptIn(ExperimentalSerializationApi::class)
+object ClientDataHelper {
+    val jsonCoder = Json {
+        explicitNulls = false
+        ignoreUnknownKeys = true
+        prettyPrint = true
+    }
+}
+
+val UserSessionInfo.availability : UserAvailabilityWindow?
+    get() = userScheduleData?.availability
+
+internal val UserSessionInfo.userScheduleData : UserScheduleData?
+    get() = clientData?.decodeObject(UserScheduleData.serializer())
+
+@OptIn(ExperimentalSerializationApi::class)
+internal inline fun <reified T> JsonElement?.decodeObject(deserializer: DeserializationStrategy<T>): T? {
+    return try {
+        this?.let {
+            ClientDataHelper.jsonCoder.decodeFromJsonElement(deserializer, it)
+        }
+    } catch (err: Throwable) {
+        Logger.e("Failed to decode ${deserializer.descriptor.serialName}", err)
+        null
+    }
+}
+
+internal inline fun <reified T> JsonElement.decodeObjectWithKey(key: String, deserializer: DeserializationStrategy<T>): T? {
+    return jsonObject[key]?.let {
+        it.decodeObject(deserializer)
+    }
+}
+

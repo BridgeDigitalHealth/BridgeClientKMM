@@ -14,6 +14,7 @@ package org.sagebionetworks.bridge.kmm.shared.models
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonObject
 
 
 /**
@@ -51,109 +52,109 @@ import kotlinx.serialization.Serializable
 data class Assessment (
     /* A human-readable identifier for an assessment, which can have one or more revisions.  */
     @SerialName("identifier")
-    val identifier: kotlin.String,
-    
+    val identifier: String,
+
     @SerialName("revision")
-    val revision: kotlin.Long,
+    val revision: Long,
 
     /* The ID of the organization that owns this assessment. Only members of that organization will be able to edit the assessment, either in an app context or in the shared assessment library.  */
     @SerialName("ownerId")
-    val ownerId: kotlin.String,
+    val ownerId: String,
 
     /* A name for the assessment that is shown to study designers, but not to study participants if there are labels that can be shown instead. */
     @SerialName("title")
-    val title: kotlin.String,
+    val title: String,
 
     /* The name of the operating system (conventional names are \"Android,\" \"iPhone OS,\" and \"Both\").  */
     @SerialName("osName")
-    val osName: kotlin.String,
+    val osName: String,
 
     /* One of an enumerated list of states an assessment can be in. */
     @SerialName("phase")
-    val phase: Assessment.Phase,
+    val phase: Phase,
 
     /* Each assessment revision is assigned a unique GUID which can be used to retrieve it through the API. Assessments will also have a unique combination of an identifier and a revision, and can be retrieved as a set of revisions under a given identifier.  */
     @SerialName("guid")
-    val guid: kotlin.String? = null,
+    val guid: String? = null,
 
     /* A collection of labels for this assessment. Only one label can be included for each language, and if the user’s language cannot be selected, English will be selected as a default. If an English label does not exist, then the assessment title can be used instead. */
     @SerialName("labels")
-    val labels: kotlin.collections.List<Label>? = null,
-    
+    val labels: List<Label>? = null,
+
     @SerialName("colorScheme")
     val colorScheme: ColorScheme? = null,
-    
+
     @SerialName("summary")
-    val summary: kotlin.String? = null,
+    val summary: String? = null,
 
     /* If this assessment was copied from a shared assessment, this will be the GUID of the shared assessment revision that was used to make this copy. Certain aspects of the assessment (notably, the assessment's configuration) are guaranteed to be identical to this origin assessment.  */
     @SerialName("originGuid")
-    val originGuid: kotlin.String? = null,
-    
+    val originGuid: String? = null,
+
     @SerialName("validationStatus")
-    val validationStatus: kotlin.String? = null,
-    
+    val validationStatus: String? = null,
+
     @SerialName("normingStatus")
-    val normingStatus: kotlin.String? = null,
+    val normingStatus: String? = null,
 
     /* The number of minutes it takes for a participant to complete this assessment. */
     @SerialName("minutesToComplete")
-    val minutesToComplete: kotlin.Int? = null,
+    val minutesToComplete: Int? = null,
 
     /* A set of tags that apply to this assessment. Tags should be namespaced with a prefix followed by a period (e.g. \"category.neurodegenerative\"), as the tag API will give you these tags in a map keyed from the prefix to a list of the values under that prefix. */
     @SerialName("tags")
-    val tags: kotlin.collections.List<kotlin.String>? = null,
+    val tags: List<String>? = null,
 
     /* A map of AssessmentNode GUIDs to a set of field identifiers in that node that can be customized by developers without invalidating an assessment (the assessment will maintain its link to the shared assessment it was derived from, if any, and the authors of the assessment are confident that these changes to the configuration will not invalidate the scientific validity of the assessment). This specification guides validation of submissions to update an AssessmentNode through a specific customization API.  */
     @SerialName("customizationFields")
-    val customizationFields: kotlin.collections.Map<kotlin.String, kotlin.collections.List<PropertyInfo>>? = null,
+    val customizationFields: Map<String, List<PropertyInfo>>? = null,
 
     /* The date and time the assessment was created. */
     @SerialName("createdOn")
-    val createdOn: kotlin.String? = null,
+    val createdOn: String? = null,
 
     /* The date and time the assessment was last modified. */
     @SerialName("modifiedOn")
-    val modifiedOn: kotlin.String? = null,
+    val modifiedOn: String? = null,
 
     /* Has this assessment been logically deleted (an admin can restore it)?  */
     @SerialName("deleted")
-    val deleted: kotlin.Boolean? = null,
+    val deleted: Boolean? = null,
 
     /* The optimistic locking version of the assessment. This value must be submitted as part of the next update of the model. If it does not match the value on the server, a 409 error (Conflict) will prevent the update from occurring. It can also serve as a key to determine if a local cache of `Assessment` needs to be updated.  */
     @SerialName("version")
-    val version: kotlin.Long? = null,
-    
+    val version: Long? = null,
+
     @SerialName("imageResource")
     val imageResource: ImageResource? = null,
 
     /* The framework this assessment belongs to. */
     @SerialName("frameworkIdentifier")
-    val frameworkIdentifier: kotlin.String? = null,
+    val frameworkIdentifier: String? = null,
 
     /* A URL for a resource specifying a JSON schema for the archived results. */
     @SerialName("jsonSchemaUrl")
-    val jsonSchemaUrl: kotlin.String? = null,
+    val jsonSchemaUrl: String? = null,
 
     /* The category of assessment. */
     @SerialName("category")
-    val category: kotlin.String? = null,
+    val category: String? = null,
 
     /* The minimum age for which this assessment has been validated. */
     @SerialName("minAge")
-    val minAge: kotlin.Int? = null,
+    val minAge: Int? = null,
     /* The maximum age for which this assessment has been validated. */
     
     @SerialName("maxAge")
-    val maxAge: kotlin.Int? = null,
+    val maxAge: Int? = null,
 
     /* Additional metadata fields, expressed as a key-value map. */
     @SerialName("additionalMetadata")
-    val additionalMetadata: kotlinx.serialization.json.JsonObject? = null,
-    
+    val additionalMetadata: JsonObject? = null,
+
     /* Assessment */
     @SerialName("type")
-    val type: kotlin.String? = null
+    val type: String? = null
 
 ) {
 

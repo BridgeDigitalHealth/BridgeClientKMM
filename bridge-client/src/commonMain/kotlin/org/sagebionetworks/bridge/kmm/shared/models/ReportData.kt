@@ -53,7 +53,5 @@ internal data class ReportData (
     @SerialName("type")
     val type: String? = "ReportData"
 
-) {
-
-}
+)
 

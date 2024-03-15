@@ -22,7 +22,7 @@ import kotlinx.serialization.Serializable
  * @param type Label
  */
 @Serializable
-public data class Label (
+data class Label (
 
     /* A valid ISO 639 alpha-2 or alpha-3 language code specifying the language of the label. */
     @SerialName("lang")
@@ -36,7 +36,5 @@ public data class Label (
     @SerialName("type")
     val type: String? = null
 
-) {
-
-}
+)
 
