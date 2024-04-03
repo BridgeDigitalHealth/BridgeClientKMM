@@ -64,7 +64,6 @@ data class AssessmentInfo (
 ) {
 
     /** Path portion of config url */
-    @Transient
     val configPath: String
         get() = Url(configUrl).encodedPath
 

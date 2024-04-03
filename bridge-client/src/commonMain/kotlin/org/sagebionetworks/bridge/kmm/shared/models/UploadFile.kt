@@ -24,7 +24,7 @@ data class UploadFile (
     }
 
     internal fun getUploadRequest(adherenceRepo: AdherenceRecordRepo?): UploadRequest {
-        val adherenceRecord = if (metadata?.instanceGuid != null && metadata?.startedOn != null) {
+        val adherenceRecord = if (metadata?.instanceGuid != null && metadata.startedOn != null) {
             adherenceRepo?.getCachedAdherenceRecord(metadata.instanceGuid, metadata.startedOn)
         } else {
             null

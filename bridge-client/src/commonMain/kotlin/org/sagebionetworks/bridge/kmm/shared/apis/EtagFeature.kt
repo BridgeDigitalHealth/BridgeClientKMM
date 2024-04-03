@@ -9,7 +9,7 @@ import io.ktor.util.*
 
 class EtagFeature private constructor(val storageCache: EtagStorageCache) {
 
-    class Config() {
+    class Config {
         var storageCache: EtagStorageCache? = null
         fun build() = EtagFeature(
             storageCache ?: throw IllegalArgumentException("EtagStorageCache cannot be null")
@@ -21,18 +21,18 @@ class EtagFeature private constructor(val storageCache: EtagStorageCache) {
 
         override fun prepare(block: Config.() -> Unit): EtagFeature = Config().apply(block).build()
 
-        override fun install(feature: EtagFeature, scope: HttpClient) {
+        override fun install(plugin: EtagFeature, scope: HttpClient) {
             scope.requestPipeline.intercept(HttpRequestPipeline.State) {
-                val eTag = feature.storageCache.getEtag(context.url.buildString())
+                val eTag = plugin.storageCache.getEtag(context.url.buildString())
                 eTag?.let {
                     context.header(HttpHeaders.IfNoneMatch, it)
                 }
             }
             scope.receivePipeline.intercept(HttpReceivePipeline.State) {
-                val eTag = subject.headers.get("etag")
+                val eTag = subject.headers["etag"]
                 val urlString = subject.request.url.toString()
                 eTag?.let {
-                    feature.storageCache.putEtag(urlString, eTag)
+                    plugin.storageCache.putEtag(urlString, eTag)
                 }
             }
         }

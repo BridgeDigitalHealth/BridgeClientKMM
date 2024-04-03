@@ -15,7 +15,6 @@ internal class PublicApi(basePath: String = BASE_PATH, httpClient: HttpClient) :
      * @param appId App ID
      * @return AppConfig
      */
-    @Suppress("UNCHECKED_CAST")
     suspend fun getConfigForApp(appId: String) : AppConfig {
         return getData("v1/apps/$appId/appconfig")
     }

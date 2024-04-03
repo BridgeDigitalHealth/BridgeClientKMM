@@ -12,6 +12,7 @@ import org.sagebionetworks.bridge.kmm.shared.cache.ResourceDatabaseHelper
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceResult
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceType
 import org.sagebionetworks.bridge.kmm.shared.models.AppConfig
+import org.sagebionetworks.bridge.kmm.shared.models.ScheduleConfig
 
 class AppConfigRepo(httpClient: HttpClient,
                     databaseHelper: ResourceDatabaseHelper,
@@ -24,7 +25,7 @@ class AppConfigRepo(httpClient: HttpClient,
     }
 
 
-    internal var publicApi = PublicApi(
+    private var publicApi = PublicApi(
         httpClient = httpClient
     )
 
@@ -34,6 +35,19 @@ class AppConfigRepo(httpClient: HttpClient,
             resourceType = ResourceType.APP_CONFIG,
             remoteLoad = { loadRemoteAppConfig() },
             studyId =  ResourceDatabaseHelper.APP_WIDE_STUDY_ID)
+    }
+
+    /**
+     * Get the app-level schedule config.
+     * @return ScheduleConfig or null
+     */
+    suspend fun getScheduleConfig() : ScheduleConfig? {
+        val resource = getResourceById<AppConfig>(
+            identifier = bridgeConfig.appId,
+            resourceType = ResourceType.APP_CONFIG,
+            remoteLoad = { loadRemoteAppConfig() },
+            studyId =  ResourceDatabaseHelper.APP_WIDE_STUDY_ID)
+        return (resource as? ResourceResult.Success)?.data?.scheduleConfig
     }
 
     private suspend fun loadRemoteAppConfig() : String {

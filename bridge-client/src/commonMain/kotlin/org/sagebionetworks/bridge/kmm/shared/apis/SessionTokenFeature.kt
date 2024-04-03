@@ -31,13 +31,13 @@ internal class SessionTokenFeature constructor(
 
         override fun prepare(block: Config.() -> Unit) = Config().apply(block).build()
 
-        override fun install(feature: SessionTokenFeature, scope: HttpClient) {
+        override fun install(plugin: SessionTokenFeature, scope: HttpClient) {
             scope.requestPipeline.intercept(HttpRequestPipeline.State) {
                 //Only applicable if we are making a call to Bridge server
                 if (this.context.url.host.contains(BRIDGE_SERVER_CHECK)) {
-                    feature.sessionTokenProvider.getSessionToken()?.apply {
-                        context.headers.remove(feature.sessionTokenHeaderName)
-                        context.header(feature.sessionTokenHeaderName, this)
+                    plugin.sessionTokenProvider.getSessionToken()?.apply {
+                        context.headers.remove(plugin.sessionTokenHeaderName)
+                        context.header(plugin.sessionTokenHeaderName, this)
                     }
                 }
             }

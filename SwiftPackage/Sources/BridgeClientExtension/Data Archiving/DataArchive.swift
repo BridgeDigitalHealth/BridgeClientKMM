@@ -32,7 +32,7 @@ open class DataArchive : NSObject, Identifiable {
     public let identifier: String
     
     /// The schedule associated with this archive (if any).
-    public let schedule: AssessmentScheduleInfo?
+    public let schedule: AdherenceRecordId?
     
     /// A timestamp for the data archive that can be mapped to an adherence record so
     /// that the record created by this library can be marked as "uploaded" in the
@@ -70,7 +70,7 @@ open class DataArchive : NSObject, Identifiable {
     private let archiver: BridgeArchiver
     
     public init?(identifier: String,
-                 schedule: AssessmentScheduleInfo? = nil,
+                 schedule: AdherenceRecordId? = nil,
                  startedOn: Date? = nil,
                  dataGroups: [String]? = nil) {
         guard let archiver = BridgeArchiver() else { return nil }
@@ -135,7 +135,7 @@ open class DataArchive : NSObject, Identifiable {
         let metadata = ArchiveMetadata(files: manifest)
         let metadataDictionary = try metadata.jsonEncodedDictionary()
         try addMetadata(metadataDictionary)
-        // TODO: syoung 08/03/2023 Remove work-around. Add info.json file b/c otherwise the upload is marked as failed. 
+        // By default, add the bridge V2 exporter support - this allows researchers to continue to use existing scripts.
         try addBridgeV2Info()
         isCompleted = true
     }
@@ -145,10 +145,11 @@ open class DataArchive : NSObject, Identifiable {
         var metadataDictionary: [String : Any] = metadata
         
         // Add metadata values from the schedule.
-        if let schedule = self.schedule {
-            metadataDictionary[kScheduledActivityGuidKey] = schedule.instanceGuid
+        metadataDictionary[kScheduledOnKey] = schedule?.scheduledOn
+        metadataDictionary[kScheduledActivityGuidKey] = schedule?.instanceGuid
+        
+        if let schedule = self.schedule as? AssessmentScheduleInfo {
             metadataDictionary[kScheduleIdentifierKey] = schedule.session.instanceGuid
-            metadataDictionary[kScheduledOnKey] = ISO8601TimestampFormatter.string(from: schedule.session.scheduledOn)
             metadataDictionary[kScheduledActivityLabelKey] = schedule.assessmentInfo.label
         }
         
@@ -215,7 +216,7 @@ open class DataArchive : NSObject, Identifiable {
                                         dataFilename: dataFilename,
                                         format: format,
                                         item: schemaIdentifier ?? identifier,
-                                        schemaRevision: schemaRevision,
+                                        schemaRevision: schemaRevision ?? 1,
                                         appName: platformConfig.appName,
                                         appVersion: platformConfig.appVersionName,
                                         phoneInfo: platformConfig.deviceInfo)
@@ -236,7 +237,7 @@ public struct BridgeUploaderInfoV2 : Encodable {
     let dataFilename: String
     let format: FormatVersion
     let item: String
-    let schemaRevision: Int?
+    let schemaRevision: Int
     let appName: String
     let appVersion: String
     let phoneInfo: String

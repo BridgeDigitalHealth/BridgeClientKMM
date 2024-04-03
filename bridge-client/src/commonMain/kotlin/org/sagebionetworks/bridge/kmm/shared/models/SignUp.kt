@@ -23,7 +23,7 @@ import kotlinx.serialization.SerialName
  * @param clientData Client data for a user should be in a syntactically valid JSON format. It will be returned as is to the client (as JSON).
  * @param languages Two letter language codes to assign to this user (these are initially retrieved from the user's `Accept-Language` header and then persisted as part of account configuration).
  * @param studyIds The studies this participant is associated to. For administrative accounts, these are the studies associated to the account's organization. For study participants, these will be the studies that the person is enrolled in.
- * @param externalIds The exernal IDs this participant is associated to, mapped to the study that issued the external ID. Typically a user signs up with the external ID, and is assigned to that study as a result.
+ * @param externalIds The external IDs this participant is associated to, mapped to the study that issued the external ID. Typically a user signs up with the external ID, and is assigned to that study as a result.
  * @param orgMembership The identifier of the organization this account is a member of (this will be an administrative account and not a study participant). Once set, it cannot be changed on an update (there are separate organization membership APIs to change organizational membership).
  * @param note Optional note related to user account. Can only be edited and viewed by an administrative account.
  * @param clientTimeZone Participant's time zone. Can be updated or deleted. Must be an IANA time zone name.
@@ -96,7 +96,7 @@ internal data class SignUp (
     @SerialName("studyIds")
     val studyIds: List<String>? = null,
 
-    /* The exernal IDs this participant is associated to, mapped to the study that issued the external ID. Typically a user signs up with the external ID, and is assigned to that study as a result. */
+    /* The external IDs this participant is associated to, mapped to the study that issued the external ID. Typically a user signs up with the external ID, and is assigned to that study as a result. */
     @SerialName("externalIds")
     val externalIds: Map<String, String>? = null,
     
@@ -112,7 +112,5 @@ internal data class SignUp (
     @SerialName("clientTimeZone")
     val clientTimeZone: String? = null
 
-) {
-
-}
+)
 

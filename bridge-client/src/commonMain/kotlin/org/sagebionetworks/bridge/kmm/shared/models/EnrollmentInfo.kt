@@ -26,33 +26,31 @@ import kotlinx.serialization.SerialName
  * @param type EnrollmentInfo
  */
 @Serializable
-public data class EnrollmentInfo (
+data class EnrollmentInfo (
     
     @SerialName("externalId")
-    val externalId: kotlin.String? = null,
+    val externalId: String? = null,
     
     @SerialName("consentRequired")
-    val consentRequired: kotlin.Boolean? = null,
+    val consentRequired: Boolean? = null,
     
     @SerialName("enrolledOn")
-    val enrolledOn: kotlin.String? = null,
+    val enrolledOn: String? = null,
     
     @SerialName("withdrawnOn")
-    val withdrawnOn: kotlin.String? = null,
+    val withdrawnOn: String? = null,
     /* If the participant enrolled themselves, the property will be present and true. Otherwise, property will not be in JSON. */
     
     @SerialName("enrolledBySelf")
-    val enrolledBySelf: kotlin.Boolean? = null,
+    val enrolledBySelf: Boolean? = null,
     /* If the participant withdrew themselves, the property will be present and true. Otherwise, property will not be in JSON. */
     
     @SerialName("withdrawnBySelf")
-    val withdrawnBySelf: kotlin.Boolean? = null,
+    val withdrawnBySelf: Boolean? = null,
     /* EnrollmentInfo */
     
     @SerialName("type")
-    val type: kotlin.String? = null
+    val type: String? = null
 
-) {
-
-}
+)
 

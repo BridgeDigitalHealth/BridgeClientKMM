@@ -21,7 +21,7 @@ class AssessmentConfigRepo(httpClient: HttpClient, databaseHelper: ResourceDatab
     }
 
 
-    internal var assessmentsApi = AssessmentsApi(
+    private var assessmentsApi = AssessmentsApi(
         httpClient = httpClient
     )
 

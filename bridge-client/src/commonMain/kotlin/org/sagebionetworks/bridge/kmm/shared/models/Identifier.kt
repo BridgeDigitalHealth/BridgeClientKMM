@@ -27,20 +27,18 @@ data class Identifier (
     /* String identifier if the participant's app. */
     
     @SerialName("appId")
-    val appId: kotlin.String,
+    val appId: String,
     /* Participant's email. */
     
     @SerialName("email")
-    val email: kotlin.String? = null,
+    val email: String? = null,
     
     @SerialName("phone")
     val phone: Phone? = null,
     /* Identifier */
     
     @SerialName("type")
-    val type: kotlin.String? = null
+    val type: String? = null
 
-) {
-
-}
+)
 

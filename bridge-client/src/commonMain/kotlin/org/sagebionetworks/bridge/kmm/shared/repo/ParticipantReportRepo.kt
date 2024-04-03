@@ -28,7 +28,7 @@ class ParticipantReportRepo(httpClient: HttpClient,
         ensureNeverFrozen()
     }
 
-    internal var participantApi = ParticipantApi(
+    private var participantApi = ParticipantApi(
         httpClient = httpClient
     )
 
@@ -116,8 +116,7 @@ class ParticipantReportRepo(httpClient: HttpClient,
     }
 
     private suspend fun processUpdates(studyId: String, resourceToUpload: Resource) {
-        val reportData = resourceToUpload.loadResource<ReportData>()
-        if (reportData == null) return
+        val reportData = resourceToUpload.loadResource<ReportData>() ?: return
         var status = ResourceStatus.FAILED
         var needSave = true
         try {

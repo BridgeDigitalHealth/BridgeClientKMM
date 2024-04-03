@@ -1,7 +1,5 @@
 package org.sagebionetworks.bridge.kmm.shared.models
 
-import kotlinx.serialization.Serializable
-
 data class S3UploadSession (
     /* The file path for the file. */
     override val filePath: String,

@@ -10,10 +10,11 @@ import org.sagebionetworks.bridge.kmm.shared.BridgeConfig
 import org.sagebionetworks.bridge.kmm.shared.apis.StudyApi
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceDatabaseHelper
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceResult
-import org.sagebionetworks.bridge.kmm.shared.cache.ResourceStatus
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceType
+import org.sagebionetworks.bridge.kmm.shared.models.ScheduleConfig
 import org.sagebionetworks.bridge.kmm.shared.models.Study
 import org.sagebionetworks.bridge.kmm.shared.models.StudyInfo
+import org.sagebionetworks.bridge.kmm.shared.models.scheduleConfig
 
 class StudyRepo(internal val bridgeConfig: BridgeConfig, httpClient: HttpClient, databaseHelper: ResourceDatabaseHelper, backgroundScope: CoroutineScope) :
     AbstractResourceRepo(databaseHelper, backgroundScope) {
@@ -23,7 +24,7 @@ class StudyRepo(internal val bridgeConfig: BridgeConfig, httpClient: HttpClient,
     }
 
 
-    internal var studyApi = StudyApi(
+    private var studyApi = StudyApi(
         httpClient = httpClient
     )
 
@@ -47,6 +48,21 @@ class StudyRepo(internal val bridgeConfig: BridgeConfig, httpClient: HttpClient,
         return getResourceByIdAsFlow(studyId, resourceType = ResourceType.STUDY, remoteLoad =  { loadRemoteStudy(studyId) },
             studyId = studyId
         )
+    }
+
+    /**
+     * Get the study-level schedule config.
+     * @param studyId Study identifier
+     * @return ScheduleConfig or null
+     */
+    internal suspend fun getScheduleConfig(studyId: String) : ScheduleConfig? {
+        val resource = getResourceById<Study>(
+            studyId,
+            resourceType = ResourceType.STUDY,
+            remoteLoad =  { loadRemoteStudy(studyId) },
+            studyId = studyId
+        )
+        return (resource as? ResourceResult.Success)?.data?.scheduleConfig
     }
 
     private suspend fun loadRemoteStudyInfo(studyId: String) : String {

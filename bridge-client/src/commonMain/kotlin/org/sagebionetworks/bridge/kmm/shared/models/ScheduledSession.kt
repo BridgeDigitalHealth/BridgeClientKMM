@@ -25,8 +25,6 @@ import kotlinx.serialization.Transient
  * @param refGuid
  * @param instanceGuid
  * @param startEventId An event ID for this scheduled session. The event ID may be mapped to a timestamp for a user. If the event ID does not exist for the user, the client should ignore this scheduled session. Otherwise, it should be shown to the user according to the scheduling information.
- * @param startDay
- * @param endDay
  * @param startTime
  * @param delayTime
  * @param expiration
@@ -52,12 +50,6 @@ data class ScheduledSession (
     @SerialName("startEventId")
     val startEventId: String? = null,
 
-//    @SerialName("startDay")
-//    val startDay: Int,
-//
-//    @SerialName("endDay")
-//    val endDay: Int,
-
     // startTime is a var so that apps (DIAN) that define this client side can change it -nbrown 7/8/22
     @SerialName("startTime")
     var startTime: LocalTime,
@@ -72,10 +64,10 @@ data class ScheduledSession (
     val persistent: Boolean = false,
 
     @SerialName("studyBurstId")
-    val studyBurstId: kotlin.String? = null,
+    val studyBurstId: String? = null,
 
     @SerialName("studyBurstNum")
-    val studyBurstNum: kotlin.Int? = null,
+    val studyBurstNum: Int? = null,
 
     @SerialName("timeWindowGuid")
     val timeWindowGuid: String? = null,

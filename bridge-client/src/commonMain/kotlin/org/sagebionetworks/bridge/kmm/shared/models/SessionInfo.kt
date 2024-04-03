@@ -37,7 +37,7 @@ data class SessionInfo (
     val label: String,
 
     @SerialName("symbol")
-    val symbol: kotlin.String? = null,
+    val symbol: String? = null,
 
     @SerialName("performanceOrder")
     val performanceOrder: PerformanceOrder,
@@ -51,7 +51,10 @@ data class SessionInfo (
 
     @SerialName("notifications")
     val notifications: List<NotificationInfo>? = null,
-    /* SessionInfo */
+
+    /** Used to store the original time window calculated from the participant schedule. **/
+    @SerialName("repeatTimeWindow")
+    var repeatTimeWindow: RepeatTimeWindow? = null,
 
     @SerialName("type")
     val type: String? = null

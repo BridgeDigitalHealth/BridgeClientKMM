@@ -16,7 +16,7 @@ import org.sagebionetworks.bridge.kmm.shared.models.*
 import kotlin.time.ExperimentalTime
 
 class ScheduleTimelineRepo(internal val adherenceRecordRepo: AdherenceRecordRepo,
-                           internal val assessmentConfigRepo: AssessmentConfigRepo,
+                           private val assessmentConfigRepo: AssessmentConfigRepo,
                            httpClient: HttpClient,
                            databaseHelper: ResourceDatabaseHelper,
                            backgroundScope: CoroutineScope,
@@ -82,7 +82,7 @@ class ScheduleTimelineRepo(internal val adherenceRecordRepo: AdherenceRecordRepo
         var schedule = scheduleApi.getParticipantScheduleForSelf(studyId)
         schedule = scheduleMutator?.mutateParticipantSchedule(schedule) ?: schedule
         participantScheduleDatabase.cacheParticipantSchedule(studyId, schedule)
-        backgroundScope.launch() {
+        backgroundScope.launch {
             schedule.assessments?.let {
                 assessmentConfigRepo.loadAndCacheConfigs(it)
             }
@@ -191,10 +191,10 @@ internal fun NotificationInfo.scheduleAt(instanceGuid: String,
     val timeZone = TimeZone.currentSystemDefault()
     val period = this.offset?.let { DateTimePeriod.parse(it) } ?: DateTimePeriod()
     val lastInstant = endDateTime.toInstant(timeZone)
-    var firstInstant = if (notifyAt == NotificationType.AFTER_WINDOW_START) {
-        startDateTime.toInstant(timeZone).plus(period, timeZone)
-    } else {
-        lastInstant.minus(period, timeZone)
+    var firstInstant = when (notifyAt) {
+        NotificationType.BEFORE_BURST_START -> startDateTime.toInstant(timeZone).minus(period, timeZone)
+        NotificationType.AFTER_WINDOW_START -> startDateTime.toInstant(timeZone).plus(period, timeZone)
+        NotificationType.BEFORE_WINDOW_END -> lastInstant.minus(period, timeZone)
     }
 
     // If there is an interval, move the firstInstant forward to after the current time
@@ -212,7 +212,7 @@ internal fun NotificationInfo.scheduleAt(instanceGuid: String,
         instanceGuid,
         firstInstant.toLocalDateTime(timeZone),
         intervalPeriod,
-        if (intervalPeriod ==null) null else lastInstant.toLocalDateTime(timeZone),
+        if (intervalPeriod == null) null else lastInstant.toLocalDateTime(timeZone),
         allowSnooze ?: false,
         message,
         isTimeSensitive
@@ -269,7 +269,7 @@ data class ScheduledAssessmentReference (
     val adherenceRecordList: List<AdherenceRecord>,
 ) {
     val isCompleted = adherenceRecordList.any { it.finishedOn != null }
-    val isDeclined = !isCompleted && adherenceRecordList.any { it.declined == true }
+    val isDeclined = !isCompleted && adherenceRecordList.any { it.declined }
 
     fun history(): List<AssessmentHistoryRecord> {
         return adherenceRecordList.mapNotNull { record ->
@@ -307,6 +307,7 @@ data class AssessmentHistoryRecord (
 //    val minutes = finishedOn.minus(startedOn).inMinutes.roundToInt()
 }
 
+@Deprecated("Use internal mutator")
 interface ParticipantScheduleMutator {
 
     fun mutateParticipantSchedule(participantSchedule: ParticipantSchedule) : ParticipantSchedule

@@ -29,49 +29,47 @@ import kotlinx.serialization.SerialName
  * @param type UserConsentHistory
  */
 @Serializable
-public data class UserConsentHistory (
+data class UserConsentHistory (
+
     /* The consent group that the participant agreed to participate in. */
-    
     @SerialName("subpopulationGuid")
-    val subpopulationGuid: kotlin.String? = null,
+    val subpopulationGuid: String? = null,
+
     /* ISO 8601 date and time that the consent was created on. */
-    
     @SerialName("consentCreatedOn")
-    val consentCreatedOn: kotlin.String? = null,
+    val consentCreatedOn: String? = null,
+
     /* Full name as entered by the participant. */
-    
     @SerialName("name")
-    val name: kotlin.String? = null,
+    val name: String? = null,
+
     /* ISO 8601 date string (e.g. \"YYYY-MM-DD\"). */
-    
     @SerialName("birthdate")
-    val birthdate: kotlin.String? = null,
+    val birthdate: String? = null,
+
     /* The signature image in a base 64 encoding. */
-    
     @SerialName("imageData")
-    val imageData: kotlin.String? = null,
+    val imageData: String? = null,
+
     /* The IANA mime type indicator for the image (e.g. \"image/png\"). */
-    
     @SerialName("imageMimeType")
-    val imageMimeType: kotlin.String? = null,
+    val imageMimeType: String? = null,
+
     /* ISO 8601 date and time that the consent was signed by the user. */
-    
     @SerialName("signedOn")
-    val signedOn: kotlin.String? = null,
+    val signedOn: String? = null,
+
     /* ISO 8601 date and time that the user withdrew the consent, if the user withdrew from a study (note that later consent records may re-enroll the user in the study; nothing prevents users from joining and quitting a study multiple times).  */
-    
     @SerialName("withdrewOn")
-    val withdrewOn: kotlin.String? = null,
+    val withdrewOn: String? = null,
+
     /* True if the user signed the most recently published version of the consent, false otherwise.  */
-    
     @SerialName("hasSignedActiveConsent")
-    val hasSignedActiveConsent: kotlin.Boolean? = null,
+    val hasSignedActiveConsent: Boolean? = null,
+
     /* UserConsentHistory */
-    
     @SerialName("type")
-    val type: kotlin.String? = null
+    val type: String? = null
 
-) {
-
-}
+)
 

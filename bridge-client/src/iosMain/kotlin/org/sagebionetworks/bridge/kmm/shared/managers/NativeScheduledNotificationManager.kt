@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 package org.sagebionetworks.bridge.kmm.shared.managers
 
 import kotlinx.coroutines.MainScope
@@ -10,9 +12,8 @@ import org.sagebionetworks.bridge.kmm.shared.repo.ScheduleTimelineRepo
 
 class NativeScheduledNotificationManager : KoinComponent {
 
-    internal val repo : ScheduleTimelineRepo by inject(mode = LazyThreadSafetyMode.NONE)
-
-    internal val scope = MainScope()
+    private val repo : ScheduleTimelineRepo by inject(mode = LazyThreadSafetyMode.NONE)
+    private val scope = MainScope()
 
     fun observeNotifications(studyId: String, callBack: (List<NativeScheduledNotification>) -> Unit) {
         scope.launch {
